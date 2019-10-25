@@ -4,12 +4,12 @@
     <input type="text" v-model="email" placeholder="Email"><br>
     <input type="password" v-model="password" placeholder="Password"><br>
     <button @click="login">Connection</button>
-    <p>You don't have an account ? You can <router-link to="/sign-up">create one</router-link></p>
+    <p>You don't have an account ? You can <router-link to="/signup">create one</router-link></p>
   </div>
 </template>
 
 <script>
-  // import firebase from 'firebase';
+  import firebase from 'firebase'
 
   export default {
     name: 'login',
@@ -21,21 +21,15 @@
     },
     methods: {
       login: function() {
-        // //this.$router.replace('home');
-        // firebase.auth().signInWithEmailAndPassword(this.email, this.password).then(
-        //   // function(user) {
-        //   //   alert('Well done ! You are now connected')
-        //   // },
-        //   (user) => {
-        //     this.$router.replace('home');
-        //   },
-        //   // function(err) {
-        //   //   alert('Oops. ' + err.message)
-        //   // }
-        //   (err) => {
-        //     alert('Oops. ' + err.message)
-        //   }
-        // )
+        firebase.auth().signInWithEmailAndPassword(this.email, this.password).then(
+          () => {
+            alert('Well done ! You are now connected')
+            this.$router.replace('home')
+          },
+          (err) => {
+            alert('Oops. ' + err.message)
+          }
+        )
       }
      }
   }

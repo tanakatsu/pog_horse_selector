@@ -2,11 +2,30 @@
   <div id="app">
     <div id="nav">
       <router-link to="/">Home</router-link> |
-      <router-link to="/about">About</router-link>
+      <router-link to="/about">About</router-link> |
+      <router-link @click.native="logout" to="/login" exact v-if="isLogined()">Logout</router-link>
     </div>
     <router-view/>
   </div>
 </template>
+
+<script>
+import firebase from 'firebase'
+
+export default {
+  methods: {
+    logout: function() {
+      alert("logout")
+      firebase.auth().signOut().then(() => {
+        this.$router.replace('login')
+      })
+    },
+    isLogined: function() {
+      return firebase.auth().currentUser
+    }
+  }
+}
+</script>
 
 <style>
 #app {

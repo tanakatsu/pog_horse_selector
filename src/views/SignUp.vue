@@ -9,7 +9,7 @@
 </template>
 
 <script>
-  // import firebase from 'firebase';
+  import firebase from 'firebase'
 
   export default {
     name: 'signUp',
@@ -21,22 +21,17 @@
     },
     methods: {
       signUp: function() {
-        // firebase.auth().createUserWithEmailAndPassword(this.email, this.password).then(
-        //   // onResolve
-        //   (user) => {
-        //     this.$router.replace('home')
-        //   },
-        //   // function (user) {
-        //   //    alert('Your account has been created !')
-        //   // },
-        //   // onReject
-        //   // function (err) {
-        //   //   alert('Oops. ' + err.message);
-        //   // }
-        //   (err) => {
-        //     alert('Oops. ' + err.message)
-        //   }
-        // );
+        firebase.auth().createUserWithEmailAndPassword(this.email, this.password).then(
+          // onResolve
+          () => {
+            alert('Your account has been created !')
+            this.$router.replace('home')
+          },
+          // onReject
+          (err) => {
+            alert('Oops. ' + err.message)
+          }
+        )
       }
     }
   }
