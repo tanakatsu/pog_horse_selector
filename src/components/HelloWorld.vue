@@ -53,7 +53,7 @@
       <!-- /default -->
       <!-- footer スロットコンテンツ -->
       <template slot="footer">
-        <button @click="doSend" :disabled="selected_ownername === ''">送信</button>
+        <button @click="doSend" :disabled="selected_ownername === '' || processing">送信</button>
         <button @click="closeModal">キャンセル</button>
       </template>
       <!-- /footer -->
@@ -62,10 +62,10 @@
 </template>
 
 <script>
+import firebase from 'firebase'
 import MyModal from './MyModal.vue'
 const horse_catalogue = require("../assets/horse_catalogue.json")
 const owner_names = require("../assets/owners.json")
-// console.log(horse_catalogue)
 
 export default {
   name: 'HelloWorld',
@@ -84,7 +84,8 @@ export default {
       tmp_horse_mare: "",
       tmp_horse_id: null,
       horse_cnt: {},
-      search_by_marename: true
+      search_by_marename: true,
+      processing: false
     }
   },
   methods: {
@@ -148,14 +149,24 @@ export default {
       this.showModal = false
     },
     doSend: function() {
-      //alert(this.tmp_horse_name)
-
       const newHorse = {id: this.tmp_horse_id, name: this.tmp_horse_name, sire: this.tmp_horse_sire, mare: this.tmp_horse_mare, po_name: this.selected_ownername, po_order_no: 0}
-      this.selected_horses.push(newHorse)
-      this.selected_horsename = ""
-      this.selected_ownername = ""
-      this.horse_cnt = this.count_horse_by_owner()
-      this.closeModal()
+      // TODO
+      // 処理中表示
+      // ボタンのロック
+      firebase.database().ref('horse').push(newHorse, (err) => {
+        // TODO
+        // 処理中表示オフ
+        // ボタンのロックの解除
+        if (err) {
+          alert(err)
+        } else {
+          this.selected_horses.push(newHorse)
+          this.selected_horsename = ""
+          this.selected_ownername = ""
+          this.horse_cnt = this.count_horse_by_owner()
+          this.closeModal()
+        }
+      })
     },
     count_horse_by_owner: function() {
       return this.selected_horses.reduce((acc, val) => {
@@ -166,6 +177,11 @@ export default {
         }
         return acc
       }, {})
+    },
+    childAdded: function(snap) {
+      const horse = snap.val()
+      this.selected_horses.push(horse)
+      this.horse_cnt = this.count_horse_by_owner() // TODO: 連動させたい
     }
   },
   created() {
@@ -178,6 +194,9 @@ export default {
       acc[val] = 0
       return acc
       }, {})
+
+    const ref_horse = firebase.database().ref('horse')
+    ref_horse.on('child_added', this.childAdded)
   },
   watch: {
     selected_horsename: function(val) {
