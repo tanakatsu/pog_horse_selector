@@ -54,7 +54,7 @@
       <!-- footer スロットコンテンツ -->
       <template slot="footer">
         <button @click="doSend" :disabled="selected_ownername === '' || processing">送信</button>
-        <button @click="closeModal">キャンセル</button>
+        <button @click="closeModal" :disabled="processing">キャンセル</button>
       </template>
       <!-- /footer -->
     </MyModal>
@@ -152,11 +152,13 @@ export default {
       const newHorse = {id: this.tmp_horse_id, name: this.tmp_horse_name, sire: this.tmp_horse_sire, mare: this.tmp_horse_mare, po_name: this.selected_ownername, po_order_no: 0}
       // TODO
       // 処理中表示
-      // ボタンのロック
+      this.processing = true
+
       firebase.database().ref('horse').push(newHorse, (err) => {
         // TODO
         // 処理中表示オフ
-        // ボタンのロックの解除
+        this.processing = false
+
         if (err) {
           alert(err)
         } else {
