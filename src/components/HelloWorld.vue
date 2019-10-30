@@ -165,25 +165,19 @@ export default {
           this.selected_horses.push(newHorse)
           this.selected_horsename = ""
           this.selected_ownername = ""
-          this.horse_cnt = this.count_horse_by_owner()
           this.closeModal()
         }
       })
     },
-    count_horse_by_owner: function() {
-      return this.selected_horses.reduce((acc, val) => {
-        if (acc[val.po_name]) {
-          acc[val.po_name] += 1
-        } else {
-          acc[val.po_name] = 1
-        }
+    initialize_horse_cnt: function() {
+      return this.owners.reduce((acc, val) => {
+        acc[val] = 0
         return acc
-      }, {})
+        }, {})
     },
     childAdded: function(snap) {
       const horse = snap.val()
       this.selected_horses.push(horse)
-      this.horse_cnt = this.count_horse_by_owner() // TODO: 連動させたい
     }
   },
   created() {
@@ -191,11 +185,7 @@ export default {
     this.horses = this.horses.map(function(data) {
       return Object.assign(data, {po_name: null, po_order_no: null})
     })
-
-    this.horse_cnt = this.owners.reduce((acc, val) => {
-      acc[val] = 0
-      return acc
-      }, {})
+    this.horse_cnt = this.initialize_horse_cnt()
 
     const ref_horse = firebase.database().ref('horse')
     ref_horse.on('child_added', this.childAdded)
@@ -209,6 +199,16 @@ export default {
       }
       this.suggested_horses = this.searchHorses(val)
       this.suggested_horses = this.suggested_horses.slice(0, 5)  // clipping
+    },
+    selected_horses: function() {
+      this.horse_cnt = this.selected_horses.reduce((acc, val) => {
+        if (acc[val.po_name]) {
+          acc[val.po_name] += 1
+        } else {
+          acc[val.po_name] = 1
+        }
+        return acc
+      }, this.initialize_horse_cnt())
     }
   },
   computed: {
