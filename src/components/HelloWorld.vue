@@ -162,7 +162,6 @@ export default {
         if (err) {
           alert(err)
         } else {
-          this.selected_horses.push(newHorse)
           this.selected_horsename = ""
           this.selected_ownername = ""
           this.closeModal()
