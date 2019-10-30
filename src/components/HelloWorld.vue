@@ -149,7 +149,7 @@ export default {
       this.showModal = false
     },
     doSend: function() {
-      const newHorse = {id: this.tmp_horse_id, name: this.tmp_horse_name, sire: this.tmp_horse_sire, mare: this.tmp_horse_mare, po_name: this.selected_ownername, po_order_no: 0}
+      const newHorse = {id: this.tmp_horse_id, name: this.tmp_horse_name, sire: this.tmp_horse_sire, mare: this.tmp_horse_mare, po_name: this.selected_ownername, po_order_no: this.horse_cnt[this.selected_ownername] + 1}
       // TODO
       // 処理中表示
       this.processing = true
