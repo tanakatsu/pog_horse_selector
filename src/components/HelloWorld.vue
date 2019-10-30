@@ -177,7 +177,19 @@ export default {
     },
     childAdded: function(snap) {
       const horse = snap.val()
-      this.selected_horses.push(horse)
+      this.selected_horses.push(Object.assign(horse, {'key': snap.key}))
+    },
+    childRemoved: function(snap) {
+      const index = this.selected_horses.findIndex((v) => v.key === snap.key)
+      this.selected_horses.splice(index, 1)
+    },
+    childChanged: function(snap) {
+      const horse = snap.val()
+      this.selected_horses.forEach((v) => {
+        if (v.key === snap.key) {
+          v = Object.assign(v, horse)
+        }
+      })
     }
   },
   created() {
@@ -189,6 +201,8 @@ export default {
 
     const ref_horse = firebase.database().ref('horse')
     ref_horse.on('child_added', this.childAdded)
+    ref_horse.on('child_removed', this.childRemoved)
+    ref_horse.on('child_changed', this.childChanged)
   },
   watch: {
     selected_horsename: function(val) {
