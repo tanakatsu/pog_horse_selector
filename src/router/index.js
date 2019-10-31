@@ -4,6 +4,7 @@ import firebase from 'firebase'
 import Home from '../views/Home.vue'
 import Login from '../views/Login.vue'
 import SignUp from '../views/SignUp.vue'
+import HorseList from '../views/HorseList.vue'
 
 Vue.use(VueRouter)
 
@@ -30,6 +31,14 @@ const routes = [
     path: '/home',
     name: 'home',
     component: Home,
+    meta: {
+      requiresAuth: true
+    }
+  },
+  {
+    path: '/horselist/:owner_name',
+    name: 'horselist',
+    component: HorseList,
     meta: {
       requiresAuth: true
     }
