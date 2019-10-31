@@ -24,7 +24,7 @@
 
     <div>
       <li v-for="(owner, index) in owners" :key='index'>
-        {{ owner }} {{ horse_cnt[owner] }}
+        {{ owner }} <router-link :to="{name: 'horselist', params: {owner_name: owner}}">{{ horse_cnt[owner] }}</router-link>
       </li>
     </div>
 
