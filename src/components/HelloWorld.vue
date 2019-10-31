@@ -184,10 +184,12 @@ export default {
     },
     childChanged: function(snap) {
       const horse = snap.val()
-      this.selected_horses.forEach((v) => {
+      // watchを発動するためforEachではなく代入する必要がある
+      this.selected_horses = this.selected_horses.map((v) => {
         if (v.key === snap.key) {
           v = Object.assign(v, horse)
         }
+        return v
       })
     }
   },
