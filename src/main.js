@@ -5,6 +5,19 @@ import firebase from 'firebase'
 
 Vue.config.productionTip = false
 
+// https://stackoverflow.com/questions/49256765/change-vue-prototype-variable-in-all-components
+let globalData = new Vue({
+  data: { $selected_horses: [] }
+})
+Vue.mixin({
+  computed: {
+    $selected_horses: {
+      get: function() { return globalData.$data.$selected_horses },
+      set: function(newVal) { globalData.$data.$selected_horses = newVal }
+    }
+  }
+})
+
 // Your web app's Firebase configuration
 var firebaseConfig = {
   apiKey: process.env.VUE_APP_FIREBASE_API_KEY,

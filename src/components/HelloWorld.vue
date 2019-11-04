@@ -181,10 +181,12 @@ export default {
     childAdded: function(snap) {
       const horse = snap.val()
       this.selected_horses.push(Object.assign(horse, {'key': snap.key}))
+      this.$selected_horses = this.selected_horses
     },
     childRemoved: function(snap) {
       const index = this.selected_horses.findIndex((v) => v.key === snap.key)
       this.selected_horses.splice(index, 1)
+      this.$selected_horses = this.selected_horses
     },
     childChanged: function(snap) {
       const horse = snap.val()
@@ -195,6 +197,7 @@ export default {
         }
         return v
       })
+      this.$selected_horses = this.selected_horses
     }
   },
   created() {
