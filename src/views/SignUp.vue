@@ -3,7 +3,8 @@
     <p>Let's create a new account !</p>
     <input type="text" v-model="email" placeholder="Email"><br>
     <input type="password" v-model="password" placeholder="Password"><br>
-    <button @click="signUp">Sign Up</button>
+    <div v-show="processing">Processing...</div>
+    <button @click="signUp" :disabled="processing">Sign Up</button>
     <span>or go back to <router-link to="/login">login</router-link>.</span>
   </div>
 </template>
@@ -16,20 +17,24 @@
     data() {
       return {
         email: '',
-        password: ''
+        password: '',
+        processing: false
       }
     },
     methods: {
       signUp: function() {
+        this.processing = true
         firebase.auth().createUserWithEmailAndPassword(this.email, this.password).then(
           // onResolve
           () => {
             alert('Your account has been created !')
+            this.processing = false
             this.$router.replace('home')
           },
           // onReject
           (err) => {
             alert('Oops. ' + err.message)
+            this.processing = false
           }
         )
       }

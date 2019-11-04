@@ -3,7 +3,8 @@
     <h3>Sigin In</h3>
     <input type="text" v-model="email" placeholder="Email"><br>
     <input type="password" v-model="password" placeholder="Password"><br>
-    <button @click="login">Connection</button>
+    <div v-show="processing">Processing...</div>
+    <button @click="login" :disabled="processing">Connection</button>
     <p>You don't have an account ? You can <router-link to="/signup">create one</router-link></p>
   </div>
 </template>
@@ -16,18 +17,22 @@
     data() {
       return {
         email: '',
-        password: ''
+        password: '',
+        processing: false
       };
     },
     methods: {
       login: function() {
+        this.processing = true
         firebase.auth().signInWithEmailAndPassword(this.email, this.password).then(
           () => {
-            alert('Well done ! You are now connected')
+            // alert('Well done ! You are now connected')
+            this.processing = false
             this.$router.replace('home')
           },
           (err) => {
             alert('Oops. ' + err.message)
+            this.processing = false
           }
         )
       }
