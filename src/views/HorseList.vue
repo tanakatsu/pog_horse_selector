@@ -4,21 +4,37 @@
 
     <ul>
       <li v-for="(horse, index) in owner_horses" :key="index">
-        {{ horse.po_order_no }} {{ horse.id }} {{ horse.name }}
+        {{ horse.po_order_no }} {{ horse.id }}
+        <a href="javascript:valid(0)" @click.prevent="openModal()">{{ horse.name }}</a>
         (父: {{ horse.sire }}, 母: {{ horse.mare }})
       </li>
     </ul>
+
+    <HorseEditModal @close="closeModal" v-if="showModal">
+    </HorseEditModal>
   </div>
 </template>
 
 <script>
+import HorseEditModal from '../components/HorseEditModal.vue'
+
 export default {
   name: "HorseList",
+  components: { HorseEditModal },
   data() {
     return {
       selected_horses: [],
       target_owner: null,
-      owner_horses: []
+      owner_horses: [],
+      showModal: false
+    }
+  },
+  methods: {
+    openModal: function() {
+      this.showModal = true
+    },
+    closeModal: function() {
+      this.showModal = false
     }
   },
   created() {
