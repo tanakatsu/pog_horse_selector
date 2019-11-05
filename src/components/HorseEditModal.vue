@@ -3,6 +3,9 @@
     <div class="modal modal-overlay" @click.self="$emit('close')">
       <div class="modal-window">
         <div class="modal-content">
+          <div>
+            {{ horse.name }}
+          </div>
           <slot/>
         </div>
         <footer class="modal-footer">
@@ -14,6 +17,20 @@
     </div>
   </transition>
 </template>
+
+<script>
+export default {
+  props: {
+    horse: {
+      type: Object
+    }
+  },
+  data() {
+    return {
+    }
+  }
+}
+</script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>

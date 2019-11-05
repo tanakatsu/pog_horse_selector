@@ -5,12 +5,12 @@
     <ul>
       <li v-for="(horse, index) in owner_horses" :key="index">
         {{ horse.po_order_no }} {{ horse.id }}
-        <a href="javascript:valid(0)" @click.prevent="openModal()">{{ horse.name }}</a>
+        <a href="javascript:valid(0)" @click.prevent="openModal(horse)">{{ horse.name }}</a>
         (父: {{ horse.sire }}, 母: {{ horse.mare }})
       </li>
     </ul>
 
-    <HorseEditModal @close="closeModal" v-if="showModal">
+    <HorseEditModal @close="closeModal" :horse="target_horse" v-if="showModal">
     </HorseEditModal>
   </div>
 </template>
@@ -25,12 +25,14 @@ export default {
     return {
       selected_horses: [],
       target_owner: null,
+      target_horse: null,
       owner_horses: [],
       showModal: false
     }
   },
   methods: {
-    openModal: function() {
+    openModal: function(horse) {
+      this.target_horse = horse
       this.showModal = true
     },
     closeModal: function() {
