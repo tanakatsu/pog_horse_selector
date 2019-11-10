@@ -115,6 +115,8 @@ export default {
   background: #ccc;
   padding: 10px;
   text-align: right;
+  display: flex;
+  justify-content: flex-end
 }
 /* オーバーレイのトランジション */
 .modal-enter-active,
@@ -138,5 +140,8 @@ export default {
 .modal-leave-to .modal-window {
   opacity: 0;
   transform: translateY(-20px);
+}
+button:first-child {
+  margin-right: auto;
 }
 </style>
