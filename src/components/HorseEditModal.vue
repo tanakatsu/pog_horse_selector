@@ -4,13 +4,30 @@
       <div class="modal-window">
         <div class="modal-content">
           <div>
-            {{ horse.name }}
+            ID <input v-model="target_horse.id" :disabled="processing">
+          </div>
+          <div>
+            馬名 <input v-model="target_horse.name" :disabled="processing">
+          </div>
+          <div>
+            父 <input v-model="target_horse.sire" :disabled="processing">
+          </div>
+          <div>
+            母 <input v-model="target_horse.mare" :disabled="processing">
+          </div>
+          <div>
+            No <input v-model="target_horse.po_order_no" type="number" :disabled="processing">
           </div>
           <slot/>
         </div>
         <footer class="modal-footer">
           <slot name="footer">
-            <button @click="$emit('close')">Close</button>
+            <button @click="deleteHorse" :disabled="processing">Delete</button>
+            <button @click="updateHorse" :disabled="processing">Update</button>
+            <button @click="$emit('close')" :disabled="processing">Close</button>
+            <div>
+               <span v-show="processing">Processing...</span>
+            </div>
           </slot>
         </footer>
       </div>
@@ -19,6 +36,8 @@
 </template>
 
 <script>
+import firebase from 'firebase'
+
 export default {
   props: {
     horse: {
@@ -27,7 +46,45 @@ export default {
   },
   data() {
     return {
+      target_horse: null,
+      processing: false,
     }
+  },
+  methods: {
+    updateHorse: function() {
+      const data_id = this.target_horse.key
+      this.processing = true
+
+      firebase.database().ref('horse/' + data_id).update({
+        id: this.target_horse.id,
+        name: this.target_horse.name,
+        sire: this.target_horse.sire,
+        mare: this.target_horse.mare,
+        po_order_no: this.target_horse.po_order_no,
+      }, (err) => {
+        if (err) {
+          alert(err)
+        }
+        this.processing = false
+        this.$emit('close')
+      })
+    },
+    deleteHorse: function() {
+      const data_id = this.target_horse.key
+      this.processing = true
+
+      firebase.database().ref('horse/' + data_id).remove((err) => {
+        if (err) {
+          alert(err)
+        }
+
+        this.processing = false
+        this.$emit('close')
+      })
+    }
+  },
+  created() {
+    this.target_horse = this.horse
   }
 }
 </script>

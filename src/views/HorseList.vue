@@ -16,6 +16,7 @@
 </template>
 
 <script>
+import firebase from 'firebase'
 import HorseEditModal from '../components/HorseEditModal.vue'
 
 export default {
@@ -37,22 +38,50 @@ export default {
     },
     closeModal: function() {
       this.showModal = false
+    },
+    childRemoved: function(snap) {
+      const index = this.selected_horses.findIndex((v) => v.key === snap.key)
+      this.selected_horses.splice(index, 1)
+      this.$selected_horses = this.selected_horses
+    },
+    childChanged: function(snap) {
+      const horse = snap.val()
+      this.selected_horses = this.selected_horses.map((v) => {
+        if (v.key === snap.key) {
+          v = Object.assign(v, horse)
+        }
+        return v
+      })
+      this.$selected_horses = this.selected_horses
+    },
+    get_owner_horses: function() {
+      this.owner_horses = this.selected_horses.filter(horse => {
+        if (horse.po_name === this.target_owner) {
+          return true
+        } else {
+          return false
+        }
+      })
+      this.owner_horses = this.owner_horses.sort((horse1, horse2) => {
+        return horse1.po_order_no - horse2.po_order_no
+      })
     }
   },
   created() {
     this.selected_horses = this.$selected_horses
     this.target_owner = this.$route.params.owner_name
-    this.owner_horses = this.selected_horses.filter(horse => {
-      if (horse.po_name === this.target_owner) {
-        return true
-      } else {
-        return false
-      }
-    })
-    this.owner_horses = this.owner_horses.sort((horse1, horse2) => {
-      return horse1.po_order_no - horse2.po_order_no
-    })
+
+    this.get_owner_horses()
+
+    const ref_horse = firebase.database().ref('horse')
+    ref_horse.on('child_removed', this.childRemoved)
+    ref_horse.on('child_changed', this.childChanged)
   },
+  watch: {
+    selected_horses: function() {
+      this.get_owner_horses()
+    }
+  }
 }
 </script>
 
