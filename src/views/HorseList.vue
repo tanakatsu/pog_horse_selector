@@ -39,10 +39,21 @@ export default {
     closeModal: function() {
       this.showModal = false
     },
+    childAdded: function(snap) {
+      const horse = snap.val()
+      const index = this.selected_horses.findIndex((v) => v.key === snap.key)
+
+      if (index < 0) {
+        this.selected_horses.push({...horse, key: snap.key})
+        this.$selected_horses = this.selected_horses
+      }
+    },
     childRemoved: function(snap) {
       const index = this.selected_horses.findIndex((v) => v.key === snap.key)
-      this.selected_horses.splice(index, 1)
-      this.$selected_horses = this.selected_horses
+      if (index >= 0) {
+        this.selected_horses.splice(index, 1)
+        this.$selected_horses = this.selected_horses
+      }
     },
     childChanged: function(snap) {
       const horse = snap.val()
@@ -74,6 +85,7 @@ export default {
     this.get_owner_horses()
 
     const ref_horse = firebase.database().ref('horse')
+    ref_horse.on('child_added', this.childAdded)
     ref_horse.on('child_removed', this.childRemoved)
     ref_horse.on('child_changed', this.childChanged)
   },
