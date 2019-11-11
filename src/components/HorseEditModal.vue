@@ -3,6 +3,12 @@
     <div class="modal modal-overlay" @click.self="$emit('close')">
       <div class="modal-window">
         <div class="modal-content">
+          <p v-if="errors.length">
+            <b>Please correct the following error(s):</b>
+            <ul>
+              <li v-for="(error, index) in errors" :key="index">{{ error }}</li>
+            </ul>
+          </p>
           <div>
             ID <input v-model="target_horse.id" :disabled="processing">
           </div>
@@ -48,10 +54,23 @@ export default {
     return {
       target_horse: null,
       processing: false,
+      errors: []
     }
   },
   methods: {
+    checkForms: function() {
+      this.errors = []
+      if (!/^\d{10}$/g.test(this.target_horse.id)) {
+        this.errors.push('ID is invalid')
+      }
+    },
     updateHorse: function() {
+      // validation
+      this.checkForms()
+      if (this.errors.length) {
+        return
+      }
+
       const data_id = this.target_horse.key
       this.processing = true
 
