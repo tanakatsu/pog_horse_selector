@@ -25,10 +25,10 @@
     <div>
       <li v-for="(owner, index) in owners" :key='index'>
         {{ owner }}
-          <span v-if="horse_cnt[owner] > 0">
-            <router-link :to="{name: 'horselist', params: {owner_name: owner}}">{{ horse_cnt[owner] }}</router-link>
+          <span v-if="owner in ownerHorseCount">
+            <router-link :to="{name: 'horselist', params: {owner_name: owner}}">{{ ownerHorseCount[owner] }}</router-link>
           </span>
-          <span v-else>{{ horse_cnt[owner] }}</span>
+          <span v-else>0</span>
       </li>
     </div>
 
@@ -67,6 +67,7 @@
 
 <script>
 import firebase from 'firebase'
+import { mapActions, mapGetters, mapState } from 'vuex'
 import MyModal from './MyModal.vue'
 const horse_catalogue = require("../assets/horse_catalogue.json")
 const owner_names = require("../assets/owners.json")
@@ -81,13 +82,11 @@ export default {
       suggested_horses: [],
       selected_horsename: "",
       selected_ownername: "",
-      selected_horses: [],
       showModal: false,
       tmp_horse_name: "",
       tmp_horse_sire: "",
       tmp_horse_mare: "",
       tmp_horse_id: null,
-      horse_cnt: {},
       search_by_marename: true,
       processing: false
     }
@@ -153,14 +152,10 @@ export default {
       this.showModal = false
     },
     doSend: function() {
-      const newHorse = {id: this.tmp_horse_id, name: this.tmp_horse_name, sire: this.tmp_horse_sire, mare: this.tmp_horse_mare, po_name: this.selected_ownername, po_order_no: this.horse_cnt[this.selected_ownername] + 1}
-      // TODO
-      // 処理中表示
+      const newHorse = {id: this.tmp_horse_id, name: this.tmp_horse_name, sire: this.tmp_horse_sire, mare: this.tmp_horse_mare, po_name: this.selected_ownername, po_order_no: this.nextHorseNo(this.selected_ownername)}
       this.processing = true
 
       firebase.database().ref('horse').push(newHorse, (err) => {
-        // TODO
-        // 処理中表示オフ
         this.processing = false
 
         if (err) {
@@ -172,45 +167,31 @@ export default {
         }
       })
     },
-    initialize_horse_cnt: function() {
-      return this.owners.reduce((acc, val) => {
-        acc[val] = 0
-        return acc
-        }, {})
+    nextHorseNo: function(owner) {
+      return (owner in this.ownerHorseCount) ? this.ownerHorseCount[owner] + 1: 1
     },
     childAdded: function(snap) {
       const horse = snap.val()
-      const index = this.selected_horses.findIndex((v) => v.key === snap.key)
-      if (index < 0) {
-        this.selected_horses.push(Object.assign(horse, {'key': snap.key}))
-        this.$selected_horses = this.selected_horses
-      }
+      this.add_horse({...horse, key: snap.key})
     },
     childRemoved: function(snap) {
-      const index = this.selected_horses.findIndex((v) => v.key === snap.key)
-      if (index >= 0) {
-        this.selected_horses.splice(index, 1)
-        this.$selected_horses = this.selected_horses
-      }
+      this.remove_horse(snap.key)
     },
     childChanged: function(snap) {
       const horse = snap.val()
-      // watchを発動するためforEachではなく代入する必要がある
-      this.selected_horses = this.selected_horses.map((v) => {
-        if (v.key === snap.key) {
-          v = Object.assign(v, horse)
-        }
-        return v
-      })
-      this.$selected_horses = this.selected_horses
-    }
+      this.update_horse({...horse, key: snap.key})
+    },
+    ...mapActions([
+      'add_horse', // this.add_horse() を this.$store.dispatch('add_horse') にマッピングする
+      'update_horse',
+      'delete_horse'
+    ])
   },
   created() {
     // Add flag
     this.horses = this.horses.map(function(data) {
       return Object.assign(data, {po_name: null, po_order_no: null})
     })
-    this.horse_cnt = this.initialize_horse_cnt()
 
     const ref_horse = firebase.database().ref('horse')
     ref_horse.on('child_added', this.childAdded)
@@ -227,18 +208,14 @@ export default {
       this.suggested_horses = this.searchHorses(val)
       this.suggested_horses = this.suggested_horses.slice(0, 5)  // clipping
     },
-    selected_horses: function() {
-      this.horse_cnt = this.selected_horses.reduce((acc, val) => {
-        if (acc[val.po_name]) {
-          acc[val.po_name] += 1
-        } else {
-          acc[val.po_name] = 1
-        }
-        return acc
-      }, this.initialize_horse_cnt())
-    }
   },
   computed: {
+    ...mapGetters([
+      'ownerHorseCount'
+    ]),
+    ...mapState([
+      'selected_horses'
+    ])
   }
 }
 </script>

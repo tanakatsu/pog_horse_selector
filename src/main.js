@@ -1,22 +1,23 @@
 import Vue from 'vue'
 import App from './App.vue'
 import router from './router'
+import store from './store'
 import firebase from 'firebase'
 
 Vue.config.productionTip = false
 
 // https://stackoverflow.com/questions/49256765/change-vue-prototype-variable-in-all-components
-let globalData = new Vue({
-  data: { $selected_horses: [] }
-})
-Vue.mixin({
-  computed: {
-    $selected_horses: {
-      get: function() { return globalData.$data.$selected_horses },
-      set: function(newVal) { globalData.$data.$selected_horses = newVal }
-    }
-  }
-})
+// let globalData = new Vue({
+//   data: { $selected_horses: [] }
+// })
+// Vue.mixin({
+//   computed: {
+//     $selected_horses: {
+//       get: function() { return globalData.$data.$selected_horses },
+//       set: function(newVal) { globalData.$data.$selected_horses = newVal }
+//     }
+//   }
+// })
 
 // Your web app's Firebase configuration
 var firebaseConfig = {
@@ -42,6 +43,7 @@ firebase.auth().onAuthStateChanged(() => {
   if (!app) {
     app = new Vue({
       router,
+      store,
       render: h => h(App)
     }).$mount('#app')
   }

@@ -17,6 +17,7 @@
 
 <script>
 import firebase from 'firebase'
+import { mapActions, mapState } from 'vuex'
 import HorseEditModal from '../components/HorseEditModal.vue'
 
 export default {
@@ -24,7 +25,6 @@ export default {
   components: { HorseEditModal },
   data() {
     return {
-      selected_horses: [],
       target_owner: null,
       target_horse: null,
       owner_horses: [],
@@ -41,29 +41,14 @@ export default {
     },
     childAdded: function(snap) {
       const horse = snap.val()
-      const index = this.selected_horses.findIndex((v) => v.key === snap.key)
-
-      if (index < 0) {
-        this.selected_horses.push({...horse, key: snap.key})
-        this.$selected_horses = this.selected_horses
-      }
+      this.add_horse({...horse, key: snap.key})
     },
     childRemoved: function(snap) {
-      const index = this.selected_horses.findIndex((v) => v.key === snap.key)
-      if (index >= 0) {
-        this.selected_horses.splice(index, 1)
-        this.$selected_horses = this.selected_horses
-      }
+      this.remove_horse(snap.key)
     },
     childChanged: function(snap) {
       const horse = snap.val()
-      this.selected_horses = this.selected_horses.map((v) => {
-        if (v.key === snap.key) {
-          v = Object.assign(v, horse)
-        }
-        return v
-      })
-      this.$selected_horses = this.selected_horses
+      this.update_horse({...horse, key: snap.key})
     },
     get_owner_horses: function() {
       this.owner_horses = this.selected_horses.filter(horse => {
@@ -76,23 +61,35 @@ export default {
       this.owner_horses = this.owner_horses.sort((horse1, horse2) => {
         return horse1.po_order_no - horse2.po_order_no
       })
-    }
+    },
+    ...mapActions([
+      'add_horse',
+      'update_horse',
+      'delete_horse',
+    ])
   },
   created() {
-    this.selected_horses = this.$selected_horses
     this.target_owner = this.$route.params.owner_name
-
     this.get_owner_horses()
+
+    // https://dev.to/viniciuskneves/watch-for-vuex-state-changes-2mgj
+    this.$store.watch(
+      (state) => state.selected_horses,
+      () => {
+        this.get_owner_horses()
+      })
 
     const ref_horse = firebase.database().ref('horse')
     ref_horse.on('child_added', this.childAdded)
     ref_horse.on('child_removed', this.childRemoved)
     ref_horse.on('child_changed', this.childChanged)
   },
+  computed: {
+    ...mapState([
+      'selected_horses'
+    ])
+  },
   watch: {
-    selected_horses: function() {
-      this.get_owner_horses()
-    }
   }
 }
 </script>
