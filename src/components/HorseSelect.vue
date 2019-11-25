@@ -32,7 +32,7 @@
       </li>
     </div>
 
-    <MyModal @close="closeModal" v-if="showModal">
+    <HorseInputModal @close="closeModal" v-if="showModal">
       <!-- default スロットコンテンツ -->
       <div>
         <div>
@@ -61,20 +61,20 @@
         <button @click="closeModal" :disabled="processing">キャンセル</button>
       </template>
       <!-- /footer -->
-    </MyModal>
+    </HorseInputModal>
   </div>
 </template>
 
 <script>
 import firebase from 'firebase'
 import { mapActions, mapGetters, mapState } from 'vuex'
-import MyModal from './MyModal.vue'
+import HorseInputModal from './HorseInputModal.vue'
 const horse_catalogue = require("../assets/horse_catalogue.json")
 const owner_names = require("../assets/owners.json")
 
 export default {
-  name: 'HelloWorld',
-  components: { MyModal },
+  //name: 'HorseSelect', // .vueファイルの場合は自動でファイル名がname属性になるため不要
+  components: { HorseInputModal },
   data() {
     return {
       horses: horse_catalogue,
