@@ -16,7 +16,6 @@
 </template>
 
 <script>
-import firebase from 'firebase'
 import { mapActions, mapState } from 'vuex'
 import HorseEditModal from '../components/HorseEditModal.vue'
 
@@ -39,17 +38,6 @@ export default {
     closeModal: function() {
       this.showModal = false
     },
-    childAdded: function(snap) {
-      const horse = snap.val()
-      this.add_horse({...horse, key: snap.key})
-    },
-    childRemoved: function(snap) {
-      this.remove_horse(snap.key)
-    },
-    childChanged: function(snap) {
-      const horse = snap.val()
-      this.update_horse({...horse, key: snap.key})
-    },
     get_owner_horses: function() {
       this.owner_horses = this.selected_horses.filter(horse => {
         if (horse.po_name === this.target_owner) {
@@ -63,9 +51,7 @@ export default {
       })
     },
     ...mapActions([
-      'add_horse',
-      'update_horse',
-      'delete_horse',
+      'fetch_data',
     ])
   },
   created() {
@@ -79,10 +65,7 @@ export default {
         this.get_owner_horses()
       })
 
-    const ref_horse = firebase.database().ref('horse')
-    ref_horse.on('child_added', this.childAdded)
-    ref_horse.on('child_removed', this.childRemoved)
-    ref_horse.on('child_changed', this.childChanged)
+    this.fetch_data()
   },
   computed: {
     ...mapState([

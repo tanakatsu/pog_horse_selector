@@ -170,21 +170,8 @@ export default {
     nextHorseNo: function(owner) {
       return (owner in this.ownerHorseCount) ? this.ownerHorseCount[owner] + 1: 1
     },
-    childAdded: function(snap) {
-      const horse = snap.val()
-      this.add_horse({...horse, key: snap.key})
-    },
-    childRemoved: function(snap) {
-      this.remove_horse(snap.key)
-    },
-    childChanged: function(snap) {
-      const horse = snap.val()
-      this.update_horse({...horse, key: snap.key})
-    },
     ...mapActions([
-      'add_horse', // this.add_horse() を this.$store.dispatch('add_horse') にマッピングする
-      'update_horse',
-      'delete_horse'
+      'fetch_data',  // this.fetch_data() を this.$store.dispatch('fetch_data') にマッピングする
     ])
   },
   created() {
@@ -193,10 +180,7 @@ export default {
       return Object.assign(data, {po_name: null, po_order_no: null})
     })
 
-    const ref_horse = firebase.database().ref('horse')
-    ref_horse.on('child_added', this.childAdded)
-    ref_horse.on('child_removed', this.childRemoved)
-    ref_horse.on('child_changed', this.childChanged)
+    this.fetch_data()
   },
   watch: {
     selected_horsename: function(val) {
