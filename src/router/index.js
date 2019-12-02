@@ -5,6 +5,7 @@ import Home from '../views/Home.vue'
 import Login from '../views/Login.vue'
 import SignUp from '../views/SignUp.vue'
 import HorseList from '../views/HorseList.vue'
+import Download from '../views/Download.vue'
 
 Vue.use(VueRouter)
 
@@ -39,6 +40,14 @@ const routes = [
     path: '/horselist/:owner_name',
     name: 'horselist',
     component: HorseList,
+    meta: {
+      requiresAuth: true
+    }
+  },
+  {
+    path: '/download',
+    name: 'download',
+    component: Download,
     meta: {
       requiresAuth: true
     }

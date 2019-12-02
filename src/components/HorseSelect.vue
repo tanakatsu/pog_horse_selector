@@ -18,9 +18,6 @@
       <input type="radio" id="by_horsename" v-bind:value="false" v-model="search_by_marename">
       <label for="by_horsename">馬名優先</label>
     </p>
-    <p>
-      <button v-bind:disabled="this.selected_horses.length === 0" v-on:click="downloadCSV">DownloadCSV</button>
-    </p>
 
     <div>
       <li v-for="(owner, index) in owners" :key='index'>
@@ -132,18 +129,6 @@ export default {
         this.tmp_horse_id = null
       }
       this.openModal()
-    },
-    downloadCSV: function() {
-      let csv = '\ufeff' + 'id,name,sire,mare\n'
-      this.selected_horses.forEach(el => {
-        const line = `${el['id']},${el['name']},${el['sire']},${el['mare']}\n`
-        csv += line
-      })
-      let blob = new Blob([csv], { type: 'text/csv' })
-      let link = document.createElement('a')
-      link.href = window.URL.createObjectURL(blob)
-      link.download = 'Result.csv'
-      link.click()
     },
     openModal: function() {
       this.showModal = true
