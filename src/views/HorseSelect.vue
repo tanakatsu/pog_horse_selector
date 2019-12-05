@@ -65,7 +65,7 @@
 <script>
 import firebase from 'firebase'
 import { mapActions, mapGetters, mapState } from 'vuex'
-import HorseInputModal from './HorseInputModal.vue'
+import HorseInputModal from '@/components/HorseInputModal.vue'
 const horse_catalogue = require("../assets/horse_catalogue.json")
 const owner_names = require("../assets/owners.json")
 

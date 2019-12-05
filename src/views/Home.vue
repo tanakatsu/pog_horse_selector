@@ -6,7 +6,7 @@
 
 <script>
 // @ is an alias to /src
-import HorseSelect from '@/components/HorseSelect.vue'
+import HorseSelect from '@/views/HorseSelect.vue'
 
 export default {
   components: {
