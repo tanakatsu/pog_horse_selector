@@ -74,7 +74,8 @@ export default new Vuex.Store({
       if (state.fetch_done) {
         return
       }
-      const ref_horse = firebase.database().ref('horse')
+      const currentUser = firebase.auth().currentUser
+      const ref_horse = firebase.database().ref('horse').orderByChild('user_email').startAt(currentUser.email).endAt(currentUser.email) // rulesに ".indexOn": ["user_email"] を追加しておくこと
       ref_horse.on('child_added', function(snap) {
         const horse = snap.val()
         commit('add_horse', {...horse, key: snap.key})

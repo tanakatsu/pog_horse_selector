@@ -137,7 +137,13 @@ export default {
       this.showModal = false
     },
     doSend: function() {
-      const newHorse = {id: this.tmp_horse_id, name: this.tmp_horse_name, sire: this.tmp_horse_sire, mare: this.tmp_horse_mare, po_name: this.selected_ownername, po_order_no: this.nextHorseNo(this.selected_ownername)}
+      const currentUser = firebase.auth().currentUser
+      const newHorse = {id: this.tmp_horse_id, name: this.tmp_horse_name,
+        sire: this.tmp_horse_sire, mare: this.tmp_horse_mare,
+        po_name: this.selected_ownername,
+        po_order_no: this.nextHorseNo(this.selected_ownername),
+        user_email: currentUser.email
+      }
       this.processing = true
 
       firebase.database().ref('horse').push(newHorse, (err) => {
