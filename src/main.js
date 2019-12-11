@@ -3,6 +3,7 @@ import App from './App.vue'
 import router from './router'
 import store from './store'
 import firebase from 'firebase'
+import moment from 'moment'
 
 Vue.config.productionTip = false
 
@@ -18,6 +19,8 @@ Vue.config.productionTip = false
 //     }
 //   }
 // })
+
+Vue.prototype.$target_year = process.env.VUE_APP_TARGET_YEAR || moment().year()
 
 // Your web app's Firebase configuration
 var firebaseConfig = {

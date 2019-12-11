@@ -72,9 +72,12 @@ export default {
       }
 
       const data_id = this.target_horse.key
+      const currentUser = firebase.auth().currentUser
+      const target_year = this.$target_year
+
       this.processing = true
 
-      firebase.database().ref('horse/' + data_id).update({
+      firebase.database().ref('horse').child(currentUser.uid).child(target_year).child(data_id).update({
         id: this.target_horse.id,
         name: this.target_horse.name,
         sire: this.target_horse.sire,
@@ -92,7 +95,9 @@ export default {
       const data_id = this.target_horse.key
       this.processing = true
 
-      firebase.database().ref('horse/' + data_id).remove((err) => {
+      const currentUser = firebase.auth().currentUser
+      const target_year = this.$target_year
+      firebase.database().ref('horse').child(currentUser.uid).child(target_year).child(data_id).remove((err) => {
         if (err) {
           alert(err)
         }

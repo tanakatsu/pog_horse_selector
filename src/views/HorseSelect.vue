@@ -142,11 +142,12 @@ export default {
         sire: this.tmp_horse_sire, mare: this.tmp_horse_mare,
         po_name: this.selected_ownername,
         po_order_no: this.nextHorseNo(this.selected_ownername),
-        user_email: currentUser.email
       }
       this.processing = true
 
-      firebase.database().ref('horse').push(newHorse, (err) => {
+      const uid = currentUser.uid
+      const target_year = this.$target_year
+      firebase.database().ref('horse').child(uid).child(target_year).push(newHorse, (err) => {
         this.processing = false
 
         if (err) {
