@@ -2,7 +2,7 @@
   <div class="hello">
     <h1>Horse select tool</h1>
     <p>
-      <input v-model="selected_horsename" type="textbox" list="horses" placeholder="馬名/母名を入力してください" size=30 />
+      <input v-model="selected_horsename" type="textbox" list="horses" placeholder="馬名/母名を入力してください" size=30 :disabled="owners.length === 0" />
       <datalist id="horses">
         <option v-for="(suggested_horse, index) in suggested_horses" v-bind:value="suggested_horse.name" v-bind:key="index">
           {{ suggested_horse.name }}
@@ -67,7 +67,6 @@ import firebase from 'firebase'
 import { mapActions, mapGetters, mapState } from 'vuex'
 import HorseInputModal from '@/components/HorseInputModal.vue'
 const horse_catalogue = require("../assets/horse_catalogue.json")
-const owner_names = require("../assets/owners.json")
 
 export default {
   //name: 'HorseSelect', // .vueファイルの場合は自動でファイル名がname属性になるため不要
@@ -75,7 +74,6 @@ export default {
   data() {
     return {
       horses: horse_catalogue,
-      owners: owner_names,
       suggested_horses: [],
       selected_horsename: "",
       selected_ownername: "",
@@ -190,7 +188,8 @@ export default {
       'ownerHorseCount'
     ]),
     ...mapState([
-      'selected_horses'
+      'selected_horses',
+      'owners'
     ])
   }
 }

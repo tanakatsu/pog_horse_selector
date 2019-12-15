@@ -7,6 +7,7 @@ Vue.use(Vuex)
 export default new Vuex.Store({
   state: {
     selected_horses: [],
+    owners: [],
     fetch_done: false,
   },
   getters: {
@@ -44,8 +45,30 @@ export default new Vuex.Store({
         state.selected_horses.splice(index, 1)
       }
     },
+    add_owner(state, payload) {
+      const index = state.owners.findIndex((v) => v.key === payload.key)
+      if (index < 0) {
+        state.owners.push(payload.name)
+      }
+    },
+    update_owner(state, payload) {
+      // forEachでもよい?
+      state.owners = state.owners.map((v) => {
+        if (v.key === payload.key) {
+          v = payload.name
+        }
+        return v
+      })
+    },
+    remove_owner(state, key) {
+      const index = state.owners.findIndex((v) => v.key === key)
+      if (index >= 0) {
+        state.owners.splice(index, 1)
+      }
+    },
     clear_data(state) {
       state.selected_horses.length = 1
+      state.owners.length = 1
     },
     set_fetch_flag(state, flag) {
       state.fetch_done = flag
@@ -62,6 +85,15 @@ export default new Vuex.Store({
     remove_horse ({ commit }, key) {
       commit('delete_horse', key)
     },
+    add_owner ({ commit }, payload) {
+      commit('add_owner', payload)
+    },
+    update_owner ({ commit }, payload) {
+      commit('update_owner', payload)
+    },
+    remove_owner ({ commit }, key) {
+      commit('delete_owner', key)
+    },
     clear_data ({ commit }) {
       const ref_horse = firebase.database().ref('horse')
       ref_horse.off('child_added')
@@ -76,8 +108,7 @@ export default new Vuex.Store({
       }
       const currentUser = firebase.auth().currentUser
       const target_year = this._vm.$target_year // https://github.com/vuejs/vuex/issues/1399
-      const path = 'horse/' + currentUser.uid + '/' + target_year
-      const ref_horse = firebase.database().ref(path)
+      const ref_horse = firebase.database().ref('horse').child(currentUser.uid).child(target_year)
       ref_horse.on('child_added', function(snap) {
         const horse = snap.val()
         commit('add_horse', {...horse, key: snap.key})
@@ -89,6 +120,20 @@ export default new Vuex.Store({
         const horse = snap.val()
         commit('update_horse', {...horse, key: snap.key})
       })
+
+      const ref_group = firebase.database().ref('group').child(currentUser.uid).child(target_year)
+      ref_group.on('child_added', function(snap) {
+        const owner = snap.val()
+        commit('add_owner', {...owner, key: snap.key})
+      })
+      ref_group.on('child_removed', function(snap) {
+        commit('remove_owner', snap.key)
+      })
+      ref_group.on('child_changed', function(snap) {
+        const owner = snap.val()
+        commit('update_owner', {...owner, key: snap.key})
+      })
+
       commit('set_fetch_flag', true)
     }
   },

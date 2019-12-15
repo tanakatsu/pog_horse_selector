@@ -6,6 +6,7 @@ import Login from '../views/Login.vue'
 import SignUp from '../views/SignUp.vue'
 import HorseList from '../views/HorseList.vue'
 import Download from '../views/Download.vue'
+import Group from '../views/Group.vue'
 
 Vue.use(VueRouter)
 
@@ -48,6 +49,14 @@ const routes = [
     path: '/download',
     name: 'download',
     component: Download,
+    meta: {
+      requiresAuth: true
+    }
+  },
+  {
+    path: '/group',
+    name: 'group',
+    component: Group,
     meta: {
       requiresAuth: true
     }
