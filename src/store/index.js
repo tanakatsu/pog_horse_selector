@@ -67,8 +67,8 @@ export default new Vuex.Store({
       }
     },
     clear_data(state) {
-      state.selected_horses.length = 1
-      state.owners.length = 1
+      state.selected_horses.length = 0
+      state.owners.length = 0
     },
     set_fetch_flag(state, flag) {
       state.fetch_done = flag
