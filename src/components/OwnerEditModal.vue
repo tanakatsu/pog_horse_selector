@@ -10,14 +10,14 @@
             </ul>
           </p>
           <div>
-            名前 <input v-model="target_owner.name" :disabled="processing">
+            名前 <input v-model="new_owner_name" :disabled="processing">
           </div>
           <slot/>
         </div>
         <footer class="modal-footer">
           <slot name="footer">
             <button @click="deleteOwner" :disabled="processing">Delete</button>
-            <button @click="updateOwner" :disabled="processing">Update</button>
+            <button @click="updateOwner" :disabled="processing || new_owner_name === owner.name">Update</button>
             <button @click="$emit('close')" :disabled="processing">Close</button>
             <div>
                <span v-show="processing">Processing...</span>
@@ -44,14 +44,15 @@ export default {
   data() {
     return {
       processing: false,
-      errors: []
+      errors: [],
+      new_owner_name: null
     }
   },
   methods: {
     checkForms: function() {
       this.errors = []
-      if (this.registered_owner_names.includes(this.target_owner.name)) {
-        this.errors.push('Name is taken.')
+      if (this.registered_owner_names.includes(this.new_owner_name)) {
+        this.errors.push('Name is already taken.')
       }
     },
     updateOwner: function() {
@@ -61,7 +62,7 @@ export default {
         return
       }
 
-      const data_id = this.target_owner.key
+      const data_id = this.owner.key
       const currentUser = firebase.auth().currentUser
       const uid = currentUser.uid
       const target_year = this.$target_year
@@ -69,7 +70,7 @@ export default {
       this.processing = true
 
       firebase.database().ref('group').child(uid).child(target_year).child(data_id).update({
-        name: this.target_owner.name,
+        name: this.new_owner_name,
       }, (err) => {
         if (err) {
           alert(err)
@@ -79,7 +80,7 @@ export default {
       })
     },
     deleteOwner: function() {
-      const data_id = this.target_owner.key
+      const data_id = this.owner.key
       this.processing = true
 
       const currentUser = firebase.auth().currentUser
@@ -96,7 +97,7 @@ export default {
     }
   },
   created() {
-    this.target_owner = this.owner
+    this.new_owner_name = this.owner.name
   }
 }
 </script>
