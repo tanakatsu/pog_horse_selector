@@ -4,24 +4,31 @@
     <div>
       <ul>
         <li v-for="(owner, index) in owners" :key="index">
-          {{ owner }}
+          <router-link :event="''" @click.native.prevent="openModal(owner)" to="">{{ owner.name }}</router-link>
         </li>
       </ul>
       <input type="textbox" v-model="new_ownername" :disabled="processing" placeholder="オーナー名"/>
       <button @click="addOwner" :disabled="new_ownername === '' || processing">Add</button>
     </div>
+    <OwnerEditModal @close="closeModal" :owner="target_owner" :registered_owner_names="registered_owner_names" v-if="showModal">
+    </OwnerEditModal>
   </div>
 </template>
 
 <script>
 import firebase from 'firebase'
 import { mapActions, mapState } from 'vuex'
+import OwnerEditModal from '../components/OwnerEditModal.vue'
 
 export default {
+  components: { OwnerEditModal },
   data() {
     return {
       new_ownername: "",
-      processing: false
+      target_owner: null,
+      registered_owner_names: [],
+      processing: false,
+      showModal: false,
     }
   },
   methods: {
@@ -41,6 +48,14 @@ export default {
           this.new_ownername = ""
         }
       })
+    },
+    openModal: function(owner) {
+      this.target_owner = owner
+      this.registered_owner_names = this.owners.map(o => o.name)
+      this.showModal = true
+    },
+    closeModal: function() {
+      this.showModal = false
     },
     ...mapActions([
       'fetch_data',

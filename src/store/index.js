@@ -48,14 +48,14 @@ export default new Vuex.Store({
     add_owner(state, payload) {
       const index = state.owners.findIndex((v) => v.key === payload.key)
       if (index < 0) {
-        state.owners.push(payload.name)
+        state.owners.push(payload)
       }
     },
     update_owner(state, payload) {
       // forEachでもよい?
       state.owners = state.owners.map((v) => {
         if (v.key === payload.key) {
-          v = payload.name
+          v = payload
         }
         return v
       })
