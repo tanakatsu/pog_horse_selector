@@ -21,7 +21,18 @@ export default new Vuex.Store({
         return acc
       }, {})
       return horse_cnt
-    }
+    },
+    ownerHorses: state => {
+      const owner_horses = state.selected_horses.reduce((acc, val) => {
+        if (acc[val.po_name]) {
+          acc[val.po_name].push(val)
+        } else {
+          acc[val.po_name] = [val]
+        }
+        return acc
+      }, {})
+      return owner_horses
+    },
   },
   mutations: {
     add_horse(state, payload) {

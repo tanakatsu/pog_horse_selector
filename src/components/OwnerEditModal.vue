@@ -31,6 +31,7 @@
 
 <script>
 import firebase from 'firebase'
+import { mapGetters } from 'vuex'
 
 export default {
   props: {
@@ -75,6 +76,7 @@ export default {
         if (err) {
           alert(err)
         }
+        this.updateHorses(this.new_owner_name) // TODO: トランザクション
         this.processing = false
         this.$emit('close')
       })
@@ -90,14 +92,50 @@ export default {
         if (err) {
           alert(err)
         }
-
+        this.deleteHorses() // TODO: トランザクション
         this.processing = false
         this.$emit('close')
       })
-    }
+    },
+    deleteHorses: function() {
+      const currentUser = firebase.auth().currentUser
+      const target_year = this.$target_year
+
+      this.owner_horses.forEach(horse => {
+        const data_id = horse.key
+        firebase.database().ref('horse').child(currentUser.uid).child(target_year).child(data_id).remove((err) => {
+          if (err) {
+            alert(err)
+          }
+          // alert(`deleted ${horse.name}`)
+        })
+      })
+    },
+    updateHorses: function(newOwnerName) {
+      const currentUser = firebase.auth().currentUser
+      const target_year = this.$target_year
+
+      this.owner_horses.forEach(horse => {
+        const data_id = horse.key
+        firebase.database().ref('horse').child(currentUser.uid).child(target_year).child(data_id).update({
+          po_name: newOwnerName
+        }, (err) => {
+          if (err) {
+            alert(err)
+          }
+          // alert(`updated ${horse.name}`) // TODO: トランザクション
+        })
+      })
+    },
   },
   created() {
     this.new_owner_name = this.owner.name
+    this.owner_horses = this.ownerHorses[this.owner.name] || []
+  },
+  computed: {
+    ...mapGetters([
+      'ownerHorses'
+    ])
   }
 }
 </script>
