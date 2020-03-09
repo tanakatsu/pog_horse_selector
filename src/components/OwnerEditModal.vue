@@ -16,7 +16,7 @@
         </div>
         <footer class="modal-footer">
           <slot name="footer">
-            <button @click="deleteOwner" :disabled="processing">Delete</button>
+            <button @click="onDeleteOwnerClicked" :disabled="processing">Delete</button>
             <button @click="updateOwner" :disabled="processing || new_owner_name === owner.name">Update</button>
             <button @click="$emit('close')" :disabled="processing">Close</button>
             <div>
@@ -80,6 +80,26 @@ export default {
         this.processing = false
         this.$emit('close')
       })
+    },
+    onDeleteOwnerClicked: function() {
+      if (this.owner_horses.length > 0) {
+        this.$dialog
+        .confirm({
+          title: 'Confirmation',
+          body: `登録馬${this.owner_horses.length}頭が削除されますがよいですか?`
+        },{
+          okText: 'はい',
+          cancelText: 'キャンセル',
+        })
+        .then(function() {
+          this.deleteOwner()
+        })
+        .catch(function() {
+          console.log('cancelled')
+        });
+      } else {
+        this.deleteOwner()
+      }
     },
     deleteOwner: function() {
       const data_id = this.owner.key

@@ -7,6 +7,11 @@ import moment from 'moment'
 
 Vue.config.productionTip = false
 
+// vuejs-dialog
+import VuejsDialog from 'vuejs-dialog'
+import 'vuejs-dialog/dist/vuejs-dialog.min.css'
+Vue.use(VuejsDialog)
+
 // https://stackoverflow.com/questions/49256765/change-vue-prototype-variable-in-all-components
 // let globalData = new Vue({
 //   data: { $selected_horses: [] }
