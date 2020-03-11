@@ -70,13 +70,18 @@ export default {
 
       this.processing = true
 
-      firebase.database().ref('group').child(uid).child(target_year).child(data_id).update({
-        name: this.new_owner_name,
-      }, (err) => {
+      const ref = firebase.database().ref()
+      const new_owner_name = this.new_owner_name
+      let updates = {}
+      updates[`/group/${uid}/${target_year}/${data_id}/name`] = this.new_owner_name
+      this.owner_horses.forEach(horse => {
+        const horse_data_id = horse.key
+        updates[`/horse/${uid}/${target_year}/${horse_data_id}/po_name`] = new_owner_name
+      })
+      ref.update(updates, (err) => {
         if (err) {
           alert(err)
         }
-        this.updateHorses(this.new_owner_name) // TODO: トランザクション
         this.processing = false
         this.$emit('close')
       })
@@ -108,43 +113,19 @@ export default {
       const currentUser = firebase.auth().currentUser
       const uid = currentUser.uid
       const target_year = this.$target_year
-      firebase.database().ref('group').child(uid).child(target_year).child(data_id).remove((err) => {
+      const ref = firebase.database().ref()
+      let updates = {}
+      updates[`/group/${uid}/${target_year}/${data_id}`] = null
+      this.owner_horses.forEach(horse => {
+        const horse_data_id = horse.key
+        updates[`/horse/${uid}/${target_year}/${horse_data_id}`] = null
+      })
+      ref.update(updates, (err) => {
         if (err) {
           alert(err)
         }
-        this.deleteHorses() // TODO: トランザクション
         this.processing = false
         this.$emit('close')
-      })
-    },
-    deleteHorses: function() {
-      const currentUser = firebase.auth().currentUser
-      const target_year = this.$target_year
-
-      this.owner_horses.forEach(horse => {
-        const data_id = horse.key
-        firebase.database().ref('horse').child(currentUser.uid).child(target_year).child(data_id).remove((err) => {
-          if (err) {
-            alert(err)
-          }
-          // alert(`deleted ${horse.name}`)
-        })
-      })
-    },
-    updateHorses: function(newOwnerName) {
-      const currentUser = firebase.auth().currentUser
-      const target_year = this.$target_year
-
-      this.owner_horses.forEach(horse => {
-        const data_id = horse.key
-        firebase.database().ref('horse').child(currentUser.uid).child(target_year).child(data_id).update({
-          po_name: newOwnerName
-        }, (err) => {
-          if (err) {
-            alert(err)
-          }
-          // alert(`updated ${horse.name}`) // TODO: トランザクション
-        })
       })
     },
   },
