@@ -100,7 +100,7 @@ export default {
           this.deleteOwner()
         })
         .catch(function() {
-          console.log('cancelled')
+          // console.log('cancelled')
         });
       } else {
         this.deleteOwner()
