@@ -180,6 +180,11 @@ export default {
         return
       }
       this.suggested_horses = this.searchHorses(val)
+
+      // すでに選ばれている馬は除外する
+      const selected_mare_list = this.selected_horses.map(horse => horse.mare)
+      this.suggested_horses = this.suggested_horses.filter(horse => !selected_mare_list.includes(horse.mare))
+
       this.suggested_horses = this.suggested_horses.slice(0, 5)  // clipping
     },
   },
