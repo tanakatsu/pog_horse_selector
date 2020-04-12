@@ -45,8 +45,8 @@
           オーナー
           <br>
           <label v-for="(owner, index) in owners" :key="index">
-            <input v-model="selected_ownername" :value="owner" :key="index" type="radio" />
-            {{owner}}
+            <input v-model="selected_ownername" :value="owner.name" :key="index" type="radio" />
+            {{owner.name}}
             <br>
           </label>
         </div>
