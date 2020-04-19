@@ -10,7 +10,7 @@
           母{{ suggested_horse.mare }}）
         </option>
       </datalist>
-      <button v-bind:disabled="this.selected_horsename === ''" v-on:click="selectHorse">Select</button>
+      <button v-bind:disabled="!this.validateHorseName(this.selected_horsename)" v-on:click="selectHorse">Select</button>
     </p>
     <p>
       <input type="radio" id="by_marename" v-bind:value="true" v-model="search_by_marename">
@@ -54,7 +54,7 @@
       <!-- /default -->
       <!-- footer スロットコンテンツ -->
       <template slot="footer">
-        <button @click="doSend" :disabled="selected_ownername === '' || processing">送信</button>
+        <button @click="doSend" :disabled="selected_ownername === '' || !this.validateHorseName(tmp_horse_name) || !this.validateMareName(tmp_horse_mare) || tmp_horse_sire === '' || processing">送信</button>
         <button @click="closeModal" :disabled="processing">キャンセル</button>
       </template>
       <!-- /footer -->
@@ -159,6 +159,32 @@ export default {
     },
     nextHorseNo: function(owner) {
       return (owner in this.ownerHorseCount) ? this.ownerHorseCount[owner] + 1: 1
+    },
+    validateHorseName: function(horseName) {
+      if (horseName === '') {
+        return false
+      }
+
+      // すでに選択済みの馬は選べない
+      const selected_name_list = this.selected_horses.map(horse => horse.name)
+      const selected_mare_list = this.selected_horses.map(horse => horse.mare)
+
+      if (selected_name_list.includes(horseName) || selected_mare_list.includes(horseName)) {
+        return false
+      }
+      return true
+    },
+    validateMareName: function(mareName) {
+      if (mareName === '') {
+        return false
+      }
+
+      // すでに選択済みの馬は選べない
+      const selected_mare_list = this.selected_horses.map(horse => horse.mare)
+      if (selected_mare_list.includes(mareName)) {
+        return false
+      }
+      return true
     },
     ...mapActions([
       'fetch_data',  // this.fetch_data() を this.$store.dispatch('fetch_data') にマッピングする
