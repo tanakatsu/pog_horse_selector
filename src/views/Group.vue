@@ -4,7 +4,7 @@
     <div>
       <ul>
         <li v-for="(owner, index) in sorted_owners" :key="index">
-          <router-link :event="''" @click.native.prevent="openModal(owner)" to="">{{ owner.name }}</router-link>
+          {{owner.no}} <router-link :event="''" @click.native.prevent="openModal(owner)" to="">{{ owner.name }}</router-link>
         </li>
       </ul>
       <input type="textbox" v-model="new_ownername" :disabled="processing" placeholder="オーナー名"/>
