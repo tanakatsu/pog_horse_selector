@@ -12,12 +12,15 @@
           <div>
             名前 <input v-model="new_owner_name" :disabled="processing">
           </div>
+          <div>
+            No <input v-model="new_owner_no" :disabled="processing" type="number">
+          </div>
           <slot/>
         </div>
         <footer class="modal-footer">
           <slot name="footer">
             <button @click="onDeleteOwnerClicked" :disabled="processing">Delete</button>
-            <button @click="updateOwner" :disabled="processing || new_owner_name === owner.name">Update</button>
+            <button @click="updateOwner" :disabled="processing || (new_owner_name === owner.name && String(new_owner_no || '') === String(owner.no || ''))">Update</button>
             <button @click="$emit('close')" :disabled="processing">Close</button>
             <div>
                <span v-show="processing">Processing...</span>
@@ -46,14 +49,19 @@ export default {
     return {
       processing: false,
       errors: [],
-      new_owner_name: null
+      new_owner_name: null,
+      new_owner_no: null
     }
   },
   methods: {
     checkForms: function() {
+      const regex = /^\d+$/
       this.errors = []
-      if (this.registered_owner_names.includes(this.new_owner_name)) {
+      if (this.owner.name !== this.new_owner_name && this.registered_owner_names.includes(this.new_owner_name)) {
         this.errors.push('Name is already taken.')
+      }
+      if (this.owner.no !== this.new_owner_no && this.new_owner_no !== '' && !regex.test(this.new_owner_no)) {
+        this.errors.push('No must be number.')
       }
     },
     updateOwner: function() {
@@ -72,12 +80,18 @@ export default {
 
       const ref = firebase.database().ref()
       const new_owner_name = this.new_owner_name
+      const new_owner_no = this.new_owner_no ? parseInt(this.new_owner_no) : null
       let updates = {}
-      updates[`/group/${uid}/${target_year}/${data_id}/name`] = this.new_owner_name
-      this.owner_horses.forEach(horse => {
-        const horse_data_id = horse.key
-        updates[`/horse/${uid}/${target_year}/${horse_data_id}/po_name`] = new_owner_name
-      })
+      if (this.owner.name !== this.new_owner_name) {
+        updates[`/group/${uid}/${target_year}/${data_id}/name`] = new_owner_name
+        this.owner_horses.forEach(horse => {
+          const horse_data_id = horse.key
+          updates[`/horse/${uid}/${target_year}/${horse_data_id}/po_name`] = new_owner_name
+        })
+      }
+      if (this.owner.no !== this.new_owner_no) {
+        updates[`/group/${uid}/${target_year}/${data_id}/no`] = new_owner_no
+      }
       ref.update(updates, (err) => {
         if (err) {
           alert(err)
@@ -131,6 +145,7 @@ export default {
   },
   created() {
     this.new_owner_name = this.owner.name
+    this.new_owner_no = this.owner.no
     this.owner_horses = this.ownerHorses[this.owner.name] || []
   },
   computed: {
