@@ -33,6 +33,19 @@ export default new Vuex.Store({
       }, {})
       return owner_horses
     },
+    sorted_owners: state => {
+      return state.owners.sort(function(a, b) {
+        if (Number.isInteger(a.no) && Number.isInteger(b.no)) {
+          return a.no - b.no
+        } else if (Number.isInteger(a.no)) {
+          return -1
+        } else if (Number.isInteger(b.no)) {
+          return 1
+        } else {
+          return 0
+        }
+      })
+    }
   },
   mutations: {
     add_horse(state, payload) {

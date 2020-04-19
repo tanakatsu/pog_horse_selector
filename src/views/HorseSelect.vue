@@ -20,7 +20,7 @@
     </p>
 
     <div>
-      <li v-for="(owner, index) in owners" :key='index'>
+      <li v-for="(owner, index) in sorted_owners" :key='index'>
         {{ owner.name }}
           <span v-if="owner.name in ownerHorseCount">
             <router-link :to="{name: 'horselist', params: {owner_name: owner.name}}">{{ ownerHorseCount[owner.name] }}</router-link>
@@ -44,7 +44,7 @@
         <div>
           オーナー
           <br>
-          <label v-for="(owner, index) in owners" :key="index">
+          <label v-for="(owner, index) in sorted_owners" :key="index">
             <input v-model="selected_ownername" :value="owner.name" :key="index" type="radio" />
             {{owner.name}}
             <br>
@@ -216,7 +216,8 @@ export default {
   },
   computed: {
     ...mapGetters([
-      'ownerHorseCount'
+      'ownerHorseCount',
+      'sorted_owners'
     ]),
     ...mapState([
       'selected_horses',

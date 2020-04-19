@@ -3,7 +3,7 @@
     <h1>My Group</h1>
     <div>
       <ul>
-        <li v-for="(owner, index) in owners" :key="index">
+        <li v-for="(owner, index) in sorted_owners" :key="index">
           <router-link :event="''" @click.native.prevent="openModal(owner)" to="">{{ owner.name }}</router-link>
         </li>
       </ul>
@@ -17,7 +17,7 @@
 
 <script>
 import firebase from 'firebase'
-import { mapActions, mapState } from 'vuex'
+import { mapActions, mapGetters } from 'vuex'
 import OwnerEditModal from '../components/OwnerEditModal.vue'
 
 export default {
@@ -51,7 +51,7 @@ export default {
     },
     openModal: function(owner) {
       this.target_owner = owner
-      this.registered_owner_names = this.owners.map(o => o.name)
+      this.registered_owner_names = this.sorted_owners.map(o => o.name)
       this.showModal = true
     },
     closeModal: function() {
@@ -65,8 +65,8 @@ export default {
     this.fetch_data()
   },
   computed: {
-    ...mapState([
-      'owners'
+    ...mapGetters([
+      'sorted_owners'
     ])
   },
   watch: {
