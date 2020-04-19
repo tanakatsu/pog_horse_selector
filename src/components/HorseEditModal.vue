@@ -29,7 +29,7 @@
         <footer class="modal-footer">
           <slot name="footer">
             <button @click="deleteHorse" :disabled="processing">Delete</button>
-            <button @click="updateHorse" :disabled="processing">Update</button>
+            <button @click="updateHorse" :disabled="!this.validateHorseName(target_horse.name) || !this.validateMareName(target_horse.mare) || processing">Update</button>
             <button @click="$emit('close')" :disabled="processing">Close</button>
             <div>
                <span v-show="processing">Processing...</span>
@@ -43,6 +43,7 @@
 
 <script>
 import firebase from 'firebase'
+import { mapState } from 'vuex'
 
 export default {
   props: {
@@ -63,6 +64,30 @@ export default {
       if (!/^\d{10}$/g.test(this.target_horse.id)) {
         this.errors.push('ID is invalid')
       }
+    },
+    validateHorseName: function(horseName) {
+      if (horseName === '') {
+        return false
+      }
+      if (horseName === this.temp_horse.name) {
+        return true
+      }
+      if (this.horsename_list.includes(horseName)) {
+        return false
+      }
+      return true
+    },
+    validateMareName: function(mareName) {
+      if (mareName === '') {
+        return false
+      }
+      if (mareName === this.temp_horse.mare) {
+        return true
+      }
+      if (this.marename_list.includes(mareName)) {
+        return false
+      }
+      return true
     },
     updateHorse: function() {
       // validation
@@ -109,6 +134,14 @@ export default {
   },
   created() {
     this.target_horse = this.horse
+    this.temp_horse = Object.assign({}, this.horse)
+    this.horsename_list = this.selected_horses.map(horse => horse.name).filter(horse => horse.name !== this.target_horse.name)
+    this.marename_list = this.selected_horses.map(horse => horse.mare).filter(horse => horse.mare !== this.target_horse.mare)
+  },
+  computed: {
+    ...mapState([
+      'selected_horses'
+    ])
   }
 }
 </script>
