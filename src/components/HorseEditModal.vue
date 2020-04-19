@@ -30,7 +30,7 @@
           <slot name="footer">
             <button @click="deleteHorse" :disabled="processing">Delete</button>
             <button @click="updateHorse" :disabled="!this.validateHorseName(target_horse.name) || !this.validateMareName(target_horse.mare) || processing">Update</button>
-            <button @click="$emit('close')" :disabled="processing">Close</button>
+            <button @click="onClose()" :disabled="processing">Close</button>
             <div>
                <span v-show="processing">Processing...</span>
             </div>
@@ -130,6 +130,15 @@ export default {
         this.processing = false
         this.$emit('close')
       })
+    },
+    onClose: function() {
+      // ダイアログを開いたときの値に戻す
+      this.target_horse.id = this.temp_horse.id
+      this.target_horse.name = this.temp_horse.name
+      this.target_horse.sire = this.temp_horse.sire
+      this.target_horse.mare = this.temp_horse.mare
+      this.target_horse.po_order_no = this.temp_horse.po_order_no
+      this.$emit('close')
     }
   },
   created() {
