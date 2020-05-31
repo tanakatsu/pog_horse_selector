@@ -15,9 +15,25 @@ export default {
   },
   methods: {
     downloadCSV: function() {
-      let csv = '\ufeff' + 'owner_name,name,sire,mare,id\n'
-      this.selected_horses.forEach(el => {
-        const line = `${el['po_name']},${el['name']},${el['sire']},${el['mare']},${el['id']}\n`
+      let csv = '\ufeff' + 'order_no,owner_name,name,sire,mare,id\n'
+
+      const sorted_horses = this.selected_horses.sort(function(a, b) {
+        if (a['po_name'] < b['po_name']) {
+          return -1
+        } else if (a['po_name'] > b['po_name']) {
+          return 1
+        } else {
+          if (a['po_order_no'] < b['po_order_no']) {
+            return -1
+          } else if (a['po_order_no'] > b['po_order_no']) {
+            return 1
+          } else {
+            return 0
+          }
+        }
+      })
+      sorted_horses.forEach(el => {
+        const line = `${el['po_order_no']},${el['po_name']},${el['name']},${el['sire']},${el['mare']},${el['id']}\n`
         csv += line
       })
       const blob = new Blob([csv], { type: 'text/csv' })
