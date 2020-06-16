@@ -119,10 +119,6 @@ export default new Vuex.Store({
       commit('delete_owner', key)
     },
     clear_data ({ commit }) {
-      const ref_horse = firebase.database().ref('horse')
-      ref_horse.off('child_added')
-      ref_horse.off('child_removed')
-      ref_horse.off('child_changed')
       commit('clear_data')
       commit('set_fetch_flag', false)
     },

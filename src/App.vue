@@ -21,7 +21,7 @@ export default {
   methods: {
     logout: function() {
       firebase.auth().signOut().then(() => {
-        this.$store.dispatch('clear_all')
+        this.$store.dispatch('clear_data')
         this.$router.replace('login')
       })
     },
