@@ -10,6 +10,7 @@ Vue.config.productionTip = false
 // vuejs-dialog
 import VuejsDialog from 'vuejs-dialog'
 import 'vuejs-dialog/dist/vuejs-dialog.min.css'
+import vuetify from './plugins/vuetify';
 Vue.use(VuejsDialog)
 
 // https://stackoverflow.com/questions/49256765/change-vue-prototype-variable-in-all-components
@@ -52,6 +53,7 @@ firebase.auth().onAuthStateChanged(() => {
     app = new Vue({
       router,
       store,
+      vuetify,
       render: h => h(App)
     }).$mount('#app')
   }

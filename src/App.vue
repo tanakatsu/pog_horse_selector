@@ -1,56 +1,48 @@
 <template>
-  <div id="app">
-    <div id="nav">
-      <router-link to="/home">Home</router-link> |
-      <router-link to="/about">About</router-link>
-      <span v-if="isLogined()"> | </span>
-      <router-link to="/group" v-if="isLogined()">Group</router-link>
-      <span v-if="isLogined()"> | </span>
-      <router-link to="/download" v-if="isLogined()">Download</router-link>
-      <span v-if="isLogined()"> | </span>
-      <router-link @click.native="logout" to="/login" exact v-if="isLogined()">Logout</router-link>
-    </div>
-    <router-view/>
-  </div>
+  <v-app>
+    <v-app-bar
+      app
+      color="primary"
+      dark
+    >
+      <div class="d-flex align-center">
+        <span>POG horse selector</span>
+      </div>
+
+      <v-spacer></v-spacer>
+
+      <v-btn text to="/home">Home</v-btn>
+      <v-btn text to="/group" v-if="isLogined()">Group</v-btn>
+      <v-btn text to="/download" v-if="isLogined()">Download</v-btn>
+      <v-btn text to="/logout" v-if="isLogined()">Logout</v-btn>
+    </v-app-bar>
+
+    <v-main>
+      <router-view/>
+    </v-main>
+  </v-app>
 </template>
 
 <script>
 import firebase from 'firebase'
 
 export default {
+  name: 'App',
+
+  data: () => ({
+    //
+  }),
+
   methods: {
     logout: function() {
       firebase.auth().signOut().then(() => {
         this.$store.dispatch('clear_data')
-        this.$router.replace('login')
+        this.$route.replace('login')
       })
     },
     isLogined: function() {
       return firebase.auth().currentUser
-    }
+    },
   }
-}
+};
 </script>
-
-<style>
-#app {
-  font-family: 'Avenir', Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-}
-
-#nav {
-  padding: 30px;
-}
-
-#nav a {
-  font-weight: bold;
-  color: #2c3e50;
-}
-
-#nav a.router-link-exact-active {
-  color: #42b983;
-}
-</style>
