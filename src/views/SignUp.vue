@@ -1,12 +1,33 @@
 <template>
-  <div class="sign-up">
-    <p>Let's create a new account !</p>
-    <input type="text" v-model="email" placeholder="Email"><br>
-    <input type="password" v-model="password" placeholder="Password"><br>
-    <div v-show="processing">Processing...</div>
-    <button @click="signUp" :disabled="processing">Sign Up</button>
-    <span>or go back to <router-link to="/login">login</router-link>.</span>
-  </div>
+  <v-container>
+    <v-row justify="center">
+      <v-col cols="6">
+        <v-card class="mx-auto mt-5">
+          <v-card-title>
+            <h1 class="display-1">サインアップ</h1>
+          </v-card-title>
+          <v-card-text>
+            <v-form>
+              <v-text-field label="ユーザ名" prepend-icon="mdi-account-circle" />
+              <v-text-field label="パスワード" v-bind:type="showPassword ? 'text': 'password'" prepend-icon="mdi-lock" @click:append="showPassword = !showPassword" v-bind:append-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'"/>
+              <v-card-actions class="justify-center">
+                <v-btn class="info" @click="signUp" :disabled="processing">サインアップ</v-btn>
+              </v-card-actions>
+            </v-form>
+            <div class="text-center">
+              <span>or go back to <router-link to="/login">login</router-link></span>
+            </div>
+            <div class="text-center">
+              <v-progress-circular
+                indeterminate
+                color="primary" v-if="processing">
+              </v-progress-circular>
+            </div>
+          </v-card-text>
+        </v-card>
+      </v-col>
+    </v-row>
+  </v-container>
 </template>
 
 <script>
@@ -17,7 +38,8 @@
       return {
         email: '',
         password: '',
-        processing: false
+        processing: false,
+        showPassword: false,
       }
     },
     methods: {
@@ -26,7 +48,7 @@
         firebase.auth().createUserWithEmailAndPassword(this.email, this.password).then(
           // onResolve
           () => {
-            alert('Your account has been created !')
+            // alert('Your account has been created !')
             this.processing = false
             this.$router.replace('home')
           },
@@ -42,23 +64,5 @@
 </script>
 
 <style scoped>
-  .signUp {
-    margin-top: 40px;
-  }
-  input {
-    margin: 10px 0;
-    width: 20%;
-    padding: 15px;
-  }
-  button {
-    margin-top: 10px;
-    width: 10%;
-    cursor: pointer;
-  }
-  span {
-    display: block;
-    margin-top: 20px;
-    font-size: 11px;
-  }
 </style>
 

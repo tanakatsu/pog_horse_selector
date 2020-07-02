@@ -1,12 +1,30 @@
 <template>
-  <div class="login">
-    <h3>Sigin In</h3>
-    <input type="text" v-model="email" placeholder="Email"><br>
-    <input type="password" v-model="password" placeholder="Password"><br>
-    <div v-show="processing">Processing...</div>
-    <button @click="login" :disabled="processing">Connection</button>
-    <p>You don't have an account ? You can <router-link to="/signup">create one</router-link></p>
-  </div>
+  <v-container>
+    <v-row justify="center">
+      <v-col cols="6">
+        <v-card class="mx-auto mt-5">
+          <v-card-title>
+            <h1 class="display-1">ログイン</h1>
+          </v-card-title>
+          <v-card-text>
+            <v-form>
+              <v-text-field label="メールアドレス" v-model="email" prepend-icon="mdi-account-circle" required></v-text-field><br>
+              <v-text-field label="パスワード" v-bind:type="showPassword ? 'text': 'password'" prepend-icon="mdi-lock" @click:append="showPassword = !showPassword" v-bind:append-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'" v-model="password" required></v-text-field>
+              <v-card-actions class="justify-center">
+                <v-btn class="info" @click="login" :disabled="processing">ログイン</v-btn>
+              </v-card-actions>
+              <div class="text-center">
+                <span>You don't have an account ? You can <router-link to="/signup">create one</router-link></span>
+              </div>
+              <div class="text-center" v-show="processing">
+                <v-progress-circular indeterminate color="primary" />
+              </div>
+            </v-form>
+          </v-card-text>
+        </v-card>
+      </v-col>
+    </v-row>
+  </v-container>
 </template>
 
 <script>
@@ -17,7 +35,8 @@
       return {
         email: '',
         password: '',
-        processing: false
+        processing: false,
+        showPassword: false
       };
     },
     methods: {
@@ -40,25 +59,4 @@
 </script>
 
 <style scoped>
-  .login {
-    margin-top: 40px;
-  }
-  input {
-    margin: 10px 0;
-    width: 20%;
-    padding: 15px;
-  }
-  button {
-    margin-top: 20px;
-    width: 10%;
-    cursor: pointer;
-  }
-  p {
-    margin-top: 40px;
-    font-size: 13px;
-  }
-  p a {
-    text-decoration: underline;
-    cursor: pointer;
-  }
 </style>
