@@ -1,8 +1,10 @@
 <template>
-  <div>
-    <h1>CSV Download</h1>
-    <button :disabled="this.selected_horses.length === 0" @click="downloadCSV">Download</button>
-  </div>
+  <v-container>
+    <div class="text-center">
+      <h1 class="mb-5">CSV Download</h1>
+      <v-btn :disabled="this.selected_horses.length === 0" @click="downloadCSV">Download</v-btn>
+    </div>
+  </v-container>
 </template>
 
 <script>
