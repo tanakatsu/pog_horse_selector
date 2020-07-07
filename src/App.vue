@@ -14,7 +14,7 @@
       <v-btn text to="/home">Home</v-btn>
       <v-btn text to="/group" v-if="isLogined()">Group</v-btn>
       <v-btn text to="/download" v-if="isLogined()">Download</v-btn>
-      <v-btn text to="/logout" v-if="isLogined()">Logout</v-btn>
+      <v-btn text to="/logout" v-if="isLogined()" @click.native="logout">Logout</v-btn>
     </v-app-bar>
 
     <v-main>
@@ -37,7 +37,7 @@ export default {
     logout: function() {
       firebase.auth().signOut().then(() => {
         this.$store.dispatch('clear_data')
-        this.$route.replace('login')
+        this.$router.replace('login')
       })
     },
     isLogined: function() {
