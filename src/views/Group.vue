@@ -9,7 +9,7 @@
           <v-card-title>
             My Group
             <v-spacer />
-              <v-text-field v-model="search" append-icon="mdi-magnify" label="検索" single-line />
+            <v-text-field v-model="search" append-icon="mdi-magnify" label="検索" single-line />
           </v-card-title>
 
           <v-btn fab x-small class="mx-2" @click="add">
