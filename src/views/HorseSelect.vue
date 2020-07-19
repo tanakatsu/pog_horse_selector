@@ -27,6 +27,15 @@
         </v-autocomplete>
       </v-col>
     </v-row>
+    <v-row justify="space-around">
+      <li v-for="(owner, index) in sorted_owners" :key='index'>
+        {{ owner.name }}
+          <span v-if="owner.name in ownerHorseCount">
+            <router-link :to="{name: 'horselist', params: {owner_name: owner.name}}">{{ ownerHorseCount[owner.name] }}</router-link>
+          </span>
+          <span v-else>0</span>
+      </li>
+    </v-row>
     <v-dialog v-model="showInputDialog" max-width="500px">
       <v-card>
         <v-card-title>
