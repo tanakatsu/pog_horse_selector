@@ -113,12 +113,12 @@ export default {
       this.showInputDialog = true
     },
     edit(owner) {
-      this.owner = owner
+      this.owner = Object.assign({}, owner)
       this.orig_owner = Object.assign({}, owner)
       this.showInputDialog = true
     },
     remove(owner) {
-      this.owner = owner
+      this.owner = Object.assign({}, owner)
       this.orig_owner = Object.assign({}, owner)
 
       this.current_owner_horses = this.ownerHorses[this.orig_owner.name] || []
