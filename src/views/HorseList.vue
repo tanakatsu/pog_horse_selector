@@ -105,12 +105,12 @@ export default {
   },
   methods: {
     edit: function(horse) {
-      this.horse = horse
+      this.horse = Object.assign({}, horse)
       this.orig_horse = Object.assign({}, horse)
       this.showInputDialog = true
     },
     remove: function(horse) {
-      this.horse = horse
+      this.horse = Object.assign({}, horse)
       this.orig_horse = Object.assign({}, horse)
       this.showConfirmDialog = true
     },
