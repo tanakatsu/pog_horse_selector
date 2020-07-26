@@ -30,31 +30,37 @@
             <template v-slot:top>
               <v-dialog v-model="showInputDialog" max-width="500px">
                 <v-card>
-                  <v-card-title>
-                    <span class="headline">{{ formTitle }}</span>
-                  </v-card-title>
-                  <v-card-text>
-                    <v-container>
-                      <v-row>
-                        <v-col cols="6">
-                          <v-text-field v-model="owner.name" label="名前" required />
-                        </v-col>
-                        <v-col cols="6">
-                          <v-text-field v-model.number="owner.no" type="number" label="No" />
-                        </v-col>
-                      </v-row>
-                    </v-container>
-                  </v-card-text>
-                  <div class="text-center" v-show="processing">
-                    <v-progress-circular indeterminate color="primary" />
-                  </div>
-                  <v-card-actions>
-                    <v-spacer />
-                    <v-btn @click="closeInputDialog">閉じる</v-btn>
-                    <v-btn v-if="isPersistedOwner" class="primary" @click="updateOwner" :disabled="owner.name === ''">更新する</v-btn>
-                    <v-btn v-else class="primary" @click="addOwner" :disabled="owner.name ===''">追加する</v-btn>
-                    <v-spacer />
-                  </v-card-actions>
+                  <validation-observer v-slot="{ invalid }" immedidate>
+                    <v-card-title>
+                      <span class="headline">{{ formTitle }}</span>
+                    </v-card-title>
+                    <v-card-text>
+                      <v-container>
+                        <v-row>
+                          <v-col cols="6">
+                            <validation-provider rules="required|isUniqueOwner" name="名前" v-slot="{ errors }">
+                              <v-text-field v-model="owner.name" label="名前" required :error-messages="errors" />
+                            </validation-provider>
+                          </v-col>
+                          <v-col cols="6">
+                            <validation-provider rules="numeric" name="No" v-slot="{ errors }">
+                              <v-text-field v-model="owner.no" label="No" :error-messages="errors" />
+                            </validation-provider>
+                          </v-col>
+                        </v-row>
+                      </v-container>
+                    </v-card-text>
+                    <div class="text-center" v-show="processing">
+                      <v-progress-circular indeterminate color="primary" />
+                    </div>
+                    <v-card-actions>
+                      <v-spacer />
+                        <v-btn @click="closeInputDialog">閉じる</v-btn>
+                        <v-btn v-if="isPersistedOwner" class="primary" @click="updateOwner" :disabled="invalid">更新する</v-btn>
+                        <v-btn v-else class="primary" @click="addOwner" :disabled="invalid">追加する</v-btn>
+                        <v-spacer />
+                    </v-card-actions>
+                  </validation-observer>
                 </v-card>
               </v-dialog>
               <v-dialog v-model="showConfirmDialog" max-width="500px">
@@ -86,8 +92,18 @@
 <script>
 import firebase from 'firebase'
 import { mapActions, mapGetters } from 'vuex'
+import { required, numeric } from 'vee-validate/dist/rules'
+import { localize, extend, ValidationObserver, ValidationProvider } from 'vee-validate'
+import ja from 'vee-validate/dist/locale/ja.json'
+extend('required', required)
+extend('numeric', numeric)
+localize('ja', ja)
 
 export default {
+  components: {
+    ValidationObserver,
+    ValidationProvider,
+  },
   data() {
     return {
       owner: {},
@@ -216,6 +232,16 @@ export default {
   },
   created() {
     this.fetch_data()
+
+    // インスタンス変数を利用するルール追加
+    extend('isUniqueOwner', (value) => {
+      const taken_names = this.sorted_owners.map(o => o.name).filter(name => name !== this.orig_owner.name)
+      if (taken_names.includes(value)) {
+        return '{_field_}はすでに使われています'
+      } else {
+        return true
+      }
+    })
   },
   computed: {
     ...mapGetters([
