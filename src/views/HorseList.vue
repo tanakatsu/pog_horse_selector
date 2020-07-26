@@ -127,7 +127,7 @@ export default {
       this.processing = true
 
       firebase.database().ref('horse').child(currentUser.uid).child(target_year).child(data_id).update({
-        id: this.horse.name,
+        id: this.horse.id,
         name: this.horse.name,
         sire: this.horse.sire,
         mare: this.horse.mare,
