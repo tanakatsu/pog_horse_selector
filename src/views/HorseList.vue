@@ -1,7 +1,7 @@
 <template>
   <v-container>
     <v-row class="justify-center mt-2">
-      <v-col class="mb-5" cols="8">
+      <v-col class="mb-5" cols="10">
         <v-card>
           <v-card-title>
             {{this.$route.params.owner_name}}'s horse list
