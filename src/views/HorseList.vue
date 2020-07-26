@@ -20,37 +20,49 @@
             <template v-slot:top>
               <v-dialog v-model="showInputDialog" max-width="500px">
                 <v-card>
-                  <v-card-title>
-                    <span class="headline">編集</span>
-                  </v-card-title>
-                  <v-card-text>
-                    <v-row>
-                      <v-col cols="3">
-                        <v-text-field v-model.number="horse.id" label="ID" required />
-                      </v-col>
-                      <v-col cols="9">
-                        <v-text-field v-model="horse.name" label="馬名" required />
-                      </v-col>
-                      <v-col cols="5">
-                        <v-text-field v-model="horse.sire" label="父" required />
-                      </v-col>
-                      <v-col cols="5">
-                        <v-text-field v-model="horse.mare" label="母" required />
-                      </v-col>
-                      <v-col cols="2">
-                        <v-text-field v-model.number="horse.po_order_no" label="No" type="number" required />
-                      </v-col>
-                    </v-row>
-                  </v-card-text>
-                  <div class="text-center" v-show="processing">
-                    <v-progress-circular indeterminate color="primary" />
-                  </div>
-                  <v-card-actions>
-                    <v-spacer />
-                    <v-btn @click="closeInputDialog">閉じる</v-btn>
-                    <v-btn class="primary" @click="updateHorse">更新する</v-btn>
-                    <v-spacer />
-                  </v-card-actions>
+                  <validation-observer v-slot="{ invalid }" immediate>
+                    <v-card-title>
+                      <span class="headline">編集</span>
+                    </v-card-title>
+                    <v-card-text>
+                      <v-row>
+                        <v-col cols="3">
+                          <validation-provider rules="isHorseId" name="ID" v-slot="{ errors }">
+                            <v-text-field v-model="horse.id" label="ID" required :error-messages="errors" />
+                          </validation-provider>
+                        </v-col>
+                        <v-col cols="9">
+                          <validation-provider rules="required|min:2|isUniqueHorseName" name="馬名" v-slot="{ errors }">
+                            <v-text-field v-model="horse.name" label="馬名" required :error-messages="errors" />
+                          </validation-provider>
+                        </v-col>
+                        <v-col cols="5">
+                          <validation-provider rules="required|min:2" name="父" v-slot="{ errors }">
+                            <v-text-field v-model="horse.sire" label="父" required :error-messages="errors" />
+                          </validation-provider>
+                        </v-col>
+                        <v-col cols="5">
+                          <validation-provider rules="required|min:2|isUniqueMare" name="母" v-slot="{ errors }">
+                            <v-text-field v-model="horse.mare" label="母" required :error-messages="errors" />
+                          </validation-provider>
+                        </v-col>
+                        <v-col cols="2">
+                          <validation-provider rules="required|numeric|min_value:1" name="No" v-slot="{ errors }">
+                            <v-text-field v-model="horse.po_order_no" label="No" required :error-messages="errors" />
+                          </validation-provider>
+                        </v-col>
+                      </v-row>
+                    </v-card-text>
+                    <div class="text-center" v-show="processing">
+                      <v-progress-circular indeterminate color="primary" />
+                    </div>
+                    <v-card-actions>
+                      <v-spacer />
+                      <v-btn @click="closeInputDialog">閉じる</v-btn>
+                      <v-btn class="primary" @click="updateHorse" :disabled="invalid">更新する</v-btn>
+                      <v-spacer />
+                    </v-card-actions>
+                  </validation-observer>
                 </v-card>
               </v-dialog>
               <v-dialog v-model="showConfirmDialog" max-width="500px">
@@ -80,9 +92,23 @@
 <script>
 import firebase from 'firebase'
 import { mapActions, mapState } from 'vuex'
+import { required, regex, min, numeric, min_value } from 'vee-validate/dist/rules'
+import { localize, extend, ValidationObserver, ValidationProvider } from 'vee-validate'
+import ja from 'vee-validate/dist/locale/ja.json'
+extend('required', required)
+extend('regex', regex)
+extend('min', min)
+extend('numeric', numeric)
+extend('min_value', min_value)
+localize('ja', ja)
+
 
 export default {
   name: "HorseList",
+  components: {
+    ValidationObserver,
+    ValidationProvider,
+  },
   data() {
     return {
       horse: {},
@@ -131,7 +157,7 @@ export default {
         name: this.horse.name,
         sire: this.horse.sire,
         mare: this.horse.mare,
-        po_order_no: this.horse.po_order_no,
+        po_order_no: parseInt(this.horse.po_order_no),
       }, (err) => {
         if (err) {
           alert(err)
@@ -182,6 +208,29 @@ export default {
       })
 
     this.fetch_data()
+
+    // インスタンス変数を利用するルールを追加
+    extend('isHorseId', (value) => {
+      const pattern = `^${this.$target_year - 2}[0-9]{6}` + '$'
+      const re = new RegExp(pattern, "g")
+      return re.test(value) || `{_field_} は ${this.$target_year - 2} で始まる10桁の数字です`
+    })
+    extend('isUniqueMare', (value) => {
+      const taken_names = this.selected_horses.map(h => h.mare).filter(name => name !== this.orig_horse.mare)
+      if (taken_names.includes(value)) {
+        return '{_field_}はすでに使われています'
+      } else {
+        return true
+      }
+    })
+    extend('isUniqueHorseName', (value) => {
+      const taken_names = this.selected_horses.map(h => h.name).filter(name => name !== this.orig_horse.name)
+      if (taken_names.includes(value)) {
+        return '{_field_}はすでに使われています'
+      } else {
+        return true
+      }
+    })
   },
   computed: {
     ...mapState([
