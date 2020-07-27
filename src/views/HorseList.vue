@@ -211,7 +211,7 @@ export default {
 
     // インスタンス変数を利用するルールを追加
     extend('isHorseId', (value) => {
-      const pattern = `^${this.$target_year - 2}[0-9]{6}` + '$'
+      const pattern = `^${this.$target_year - 2}[0-9]{6}$`
       const re = new RegExp(pattern, "g")
       return re.test(value) || `{_field_} は ${this.$target_year - 2} で始まる10桁の数字です`
     })

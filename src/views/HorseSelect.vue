@@ -38,42 +38,54 @@
     </v-row>
     <v-dialog v-model="showInputDialog" max-width="500px">
       <v-card>
-        <v-card-title>
-          <span class="headline">登録</span>
-        </v-card-title>
-        <v-card-text>
-          <v-row>
-            <v-col cols="3">
-              <v-text-field v-model.number="horse.id" label="ID" required />
-            </v-col>
-            <v-col cols="9">
-              <v-text-field v-model="horse.name" label="馬名" required />
-            </v-col>
-            <v-col cols="6">
-              <v-text-field v-model="horse.sire" label="父" required />
-            </v-col>
-            <v-col cols="6">
-              <v-text-field v-model="horse.mare" label="母" required />
-            </v-col>
-          </v-row>
-          <v-row>
-            <div class="mx-3">
-              オーナー
-              <v-radio-group v-model="owner_name" row>
-                <v-radio v-for="(owner, index) in sorted_owners" :label="owner.name" :value="owner.name" :key="index"></v-radio>
-              </v-radio-group>
-            </div>
-          </v-row>
-        </v-card-text>
-        <div class="text-center" v-show="processing">
-          <v-progress-circular indeterminate color="primary" />
-        </div>
-        <v-card-actions>
-          <v-spacer />
-            <v-btn @click="closeInputDialog">閉じる</v-btn>
-            <v-btn class="primary" @click="addHorse">登録する</v-btn>
-          <v-spacer />
-        </v-card-actions>
+        <validation-observer v-slot="{ invalid }" immediate>
+          <v-card-title>
+            <span class="headline">登録</span>
+          </v-card-title>
+          <v-card-text>
+            <v-row>
+              <v-col cols="3">
+                <validation-provider rules="isHorseId" name="ID" v-slot="{ errors }">
+                  <v-text-field v-model="horse.id" label="ID" required :error-messages="errors" />
+                </validation-provider>
+              </v-col>
+              <v-col cols="9">
+                <validation-provider rules="required|min:2|isUniqueHorseName" name="馬名" v-slot="{ errors }">
+                  <v-text-field v-model="horse.name" label="馬名" required :error-messages="errors" />
+                </validation-provider>
+              </v-col>
+              <v-col cols="6">
+                <validation-provider rules="required|min:2" name="父" v-slot="{ errors }">
+                  <v-text-field v-model="horse.sire" label="父" required :error-messages="errors" />
+                </validation-provider>
+              </v-col>
+              <v-col cols="6">
+                <validation-provider rules="required|min:2|isUniqueMare" name="母" v-slot="{ errors }">
+                  <v-text-field v-model="horse.mare" label="母" required :error-messages="errors" />
+                </validation-provider>
+              </v-col>
+            </v-row>
+            <v-row>
+              <div class="mx-3">
+                オーナー
+                <validation-provider rules="required" name="オーナー" v-slot="{ errors }">
+                  <v-radio-group v-model="owner_name" row :error-messages="errors">
+                    <v-radio v-for="(owner, index) in sorted_owners" :label="owner.name" :value="owner.name" :key="index"></v-radio>
+                  </v-radio-group>
+                </validation-provider>
+              </div>
+            </v-row>
+          </v-card-text>
+          <div class="text-center" v-show="processing">
+            <v-progress-circular indeterminate color="primary" />
+          </div>
+          <v-card-actions>
+            <v-spacer />
+              <v-btn @click="closeInputDialog">閉じる</v-btn>
+              <v-btn class="primary" @click="addHorse" :disabled="invalid">登録する</v-btn>
+            <v-spacer />
+          </v-card-actions>
+        </validation-observer>
       </v-card>
     </v-dialog>
   </v-container>
@@ -82,10 +94,23 @@
 <script>
 import firebase from 'firebase'
 import { mapActions, mapGetters, mapState } from 'vuex'
+import { required, regex, min, numeric, min_value } from 'vee-validate/dist/rules'
+import { localize, extend, ValidationObserver, ValidationProvider } from 'vee-validate'
+import ja from 'vee-validate/dist/locale/ja.json'
 const horse_catalogue = require("../assets/horse_catalogue.json")
+extend('required', required)
+extend('regex', regex)
+extend('min', min)
+extend('numeric', numeric)
+extend('min_value', min_value)
+localize('ja', ja)
 
 export default {
   //name: 'HorseSelect', // .vueファイルの場合は自動でファイル名がname属性になるため不要
+  components: {
+    ValidationObserver,
+    ValidationProvider,
+  },
   data() {
     return {
       horses: horse_catalogue,
@@ -139,6 +164,7 @@ export default {
       this.showInputDialog = true
     },
     closeInputDialog: function() {
+      this.owner_name = null
       this.showInputDialog = false
     },
     addHorse: function() {
@@ -157,39 +183,12 @@ export default {
         } else {
           this.horse = {}
           this.selected_mare = ""
-          this.owner_name = ""
           this.closeInputDialog()
         }
       })
     },
     nextHorseNo: function(owner) {
       return (owner in this.ownerHorseCount) ? this.ownerHorseCount[owner] + 1: 1
-    },
-    validateHorseName: function(horseName) {
-      if (horseName === '') {
-        return false
-      }
-
-      // すでに選択済みの馬は選べない
-      const selected_name_list = this.selected_horses.map(horse => horse.name)
-      const selected_mare_list = this.selected_horses.map(horse => horse.mare)
-
-      if (selected_name_list.includes(horseName) || selected_mare_list.includes(horseName)) {
-        return false
-      }
-      return true
-    },
-    validateMareName: function(mareName) {
-      if (mareName === '') {
-        return false
-      }
-
-      // すでに選択済みの馬は選べない
-      const selected_mare_list = this.selected_horses.map(horse => horse.mare)
-      if (selected_mare_list.includes(mareName)) {
-        return false
-      }
-      return true
     },
     ...mapActions([
       'fetch_data',  // this.fetch_data() を this.$store.dispatch('fetch_data') にマッピングする
@@ -202,6 +201,29 @@ export default {
     })
 
     this.fetch_data()
+
+    // インスタンス変数を利用するルールを追加
+    extend('isHorseId', (value) => {
+      const pattern = `^${this.$target_year - 2}[0-9]{6}$`
+      const re = new RegExp(pattern, "g")
+      return re.test(value) || `{_field_} は ${this.$target_year - 2} で始まる10桁の数字です`
+    })
+    extend('isUniqueMare', (value) => {
+      const taken_names = this.selected_horses.map(h => h.mare)
+      if (taken_names.includes(value)) {
+        return '{_field_}はすでに使われています'
+      } else {
+        return true
+      }
+    })
+    extend('isUniqueHorseName', (value) => {
+      const taken_names = this.selected_horses.map(h => h.name)
+      if (taken_names.includes(value)) {
+        return '{_field_}はすでに使われています'
+      } else {
+        return true
+      }
+    })
   },
   watch: {
     search: function(val) {
