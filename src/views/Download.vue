@@ -2,7 +2,10 @@
   <v-container>
     <div class="text-center">
       <h1 class="mb-5">CSV Download</h1>
-      <v-btn :disabled="this.selected_horses.length === 0" @click="downloadCSV">Download</v-btn>
+      <v-btn :disabled="this.selected_horses.length === 0" @click="downloadCSV">
+        Download
+        <v-icon right dark>mdi-cloud-download</v-icon>
+      </v-btn>
     </div>
   </v-container>
 </template>
