@@ -1,5 +1,23 @@
 <template>
   <v-container>
+    <v-row>
+      <v-spacer />
+      <v-menu>
+        <template v-slot:activator="{ on, attrs }">
+          <v-icon v-on="on" v-bind="attrs">mdi-cog</v-icon>
+        </template>
+        <v-list>
+          <v-subheader>Max Suggests</v-subheader>
+          <v-list-item
+            v-for="(item, index) in max_suggests"
+            :key="index"
+            @click="max_suggest = item"
+            >
+            <v-list-item-title>{{ item }}</v-list-item-title>
+          </v-list-item>
+        </v-list>
+      </v-menu>
+    </v-row>
     <v-row class="justify-center">
       <v-col class="mb-5" cols="8">
         <h1 class="mb-5">Horse select</h1>
@@ -122,6 +140,7 @@ export default {
       showInputDialog: false,
       processing: false,
       max_suggest: 5,
+      max_suggests: [3, 5, 8, 10],
     }
   },
   methods: {
