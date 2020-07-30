@@ -63,7 +63,7 @@
           <v-card-text>
             <v-row>
               <v-col cols="3">
-                <validation-provider rules="isHorseId" name="ID" v-slot="{ errors }">
+                <validation-provider :rules="`isHorseId:${$target_year - 2}`" name="ID" v-slot="{ errors }">
                   <v-text-field v-model="horse.id" label="ID" required :error-messages="errors" />
                 </validation-provider>
               </v-col>
@@ -122,6 +122,16 @@ extend('min', min)
 extend('numeric', numeric)
 extend('min_value', min_value)
 localize('ja', ja)
+
+extend('isHorseId', {
+  validate(value, args) {
+    const pattern = `^${args.year}[0-9]{6}$`
+    const re = new RegExp(pattern, "g")
+    return re.test(value) || `{_field_} は ${args.year} で始まる10桁の数字です`
+  },
+  params: ['year'],
+})
+
 
 export default {
   //name: 'HorseSelect', // .vueファイルの場合は自動でファイル名がname属性になるため不要
@@ -222,11 +232,6 @@ export default {
     this.fetch_data()
 
     // インスタンス変数を利用するルールを追加
-    extend('isHorseId', (value) => {
-      const pattern = `^${this.$target_year - 2}[0-9]{6}$`
-      const re = new RegExp(pattern, "g")
-      return re.test(value) || `{_field_} は ${this.$target_year - 2} で始まる10桁の数字です`
-    })
     extend('isUniqueMare', (value) => {
       const taken_names = this.selected_horses.map(h => h.mare)
       if (taken_names.includes(value)) {
