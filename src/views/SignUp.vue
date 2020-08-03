@@ -7,7 +7,7 @@
             <h1 class="display-1">サインアップ</h1>
           </v-card-title>
           <v-card-text>
-            <validation-observer v-slot="{ invalid }" immediate>
+            <validation-observer v-slot="{ invalid }">
               <v-form>
                 <validation-provider rules="required|email" name="ユーザ名" v-slot="{ errors, valid }">
                   <v-text-field label="ユーザ名" prepend-icon="mdi-account-circle" required :error-messages="errors" :success="valid" v-model="email"/>

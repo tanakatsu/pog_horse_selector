@@ -20,7 +20,7 @@
             <template v-slot:top>
               <v-dialog v-model="showInputDialog" max-width="500px">
                 <v-card>
-                  <validation-observer v-slot="{ invalid }" immediate>
+                  <validation-observer v-slot="{ invalid }">
                     <v-card-title>
                       <span class="headline">編集</span>
                     </v-card-title>

@@ -56,7 +56,7 @@
     </v-row>
     <v-dialog v-model="showInputDialog" max-width="500px">
       <v-card>
-        <validation-observer v-slot="{ invalid }" immediate>
+        <validation-observer v-slot="{ invalid }">
           <v-card-title>
             <span class="headline">登録</span>
           </v-card-title>
