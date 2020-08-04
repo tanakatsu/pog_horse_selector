@@ -7,16 +7,16 @@
             <h1 class="display-1">ログイン</h1>
           </v-card-title>
           <v-card-text>
-            <validation-observer v-slot="{ invalid }">
-              <v-form>
-                <validation-provider rules="required|email" name="メールアドレス" v-slot="{ errors, valid }">
-                  <v-text-field label="メールアドレス" v-model="email" prepend-icon="mdi-account-circle" required :error-messages="errors" :success="valid"></v-text-field>
+            <validation-observer ref="observer" v-slot="{ handleSubmit }">
+              <v-form @submit.prevent="handleSubmit(login)">
+                <validation-provider rules="required|email" name="メールアドレス" v-slot="{ errors }">
+                  <v-text-field label="メールアドレス" v-model="email" prepend-icon="mdi-account-circle" required :error-messages="errors"></v-text-field>
                 </validation-provider>
-                <validation-provider rules="required" name="パスワード" v-slot="{ errors, valid }">
-                  <v-text-field label="パスワード" v-bind:type="showPassword ? 'text': 'password'" prepend-icon="mdi-lock" @click:append="showPassword = !showPassword" v-bind:append-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'" v-model="password" required :error-messages="errors" :success="valid"></v-text-field>
+                <validation-provider rules="required" name="パスワード" v-slot="{ errors }">
+                  <v-text-field label="パスワード" v-bind:type="showPassword ? 'text': 'password'" prepend-icon="mdi-lock" @click:append="showPassword = !showPassword" v-bind:append-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'" v-model="password" required :error-messages="errors"></v-text-field>
                 </validation-provider>
                 <v-card-actions class="justify-center">
-                  <v-btn class="info" @click="login" :disabled="processing || invalid">ログイン</v-btn>
+                  <v-btn class="info" type="submit" :disabled="processing" >ログイン</v-btn>
                 </v-card-actions>
                 <div class="text-center">
                   <span>You don't have an account ? You can <router-link to="/signup">create one</router-link></span>

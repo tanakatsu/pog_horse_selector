@@ -7,16 +7,16 @@
             <h1 class="display-1">サインアップ</h1>
           </v-card-title>
           <v-card-text>
-            <validation-observer v-slot="{ invalid }">
-              <v-form>
-                <validation-provider rules="required|email" name="ユーザ名" v-slot="{ errors, valid }">
-                  <v-text-field label="ユーザ名" prepend-icon="mdi-account-circle" required :error-messages="errors" :success="valid" v-model="email"/>
+            <validation-observer v-slot="{ handleSubmit }">
+              <v-form @submit.prevent="handleSubmit(signUp)">
+                <validation-provider rules="required|email" name="ユーザ名" v-slot="{ errors }">
+                  <v-text-field label="ユーザ名" prepend-icon="mdi-account-circle" required :error-messages="errors" v-model="email"/>
                 </validation-provider>
-                <validation-provider rules="required" name="パスワード" v-slot="{ errors, valid }">
-                  <v-text-field label="パスワード" v-bind:type="showPassword ? 'text': 'password'" prepend-icon="mdi-lock" @click:append="showPassword = !showPassword" v-bind:append-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'" :error-messages="errors" :success="valid" v-model="password" />
+                <validation-provider rules="required" name="パスワード" v-slot="{ errors }">
+                  <v-text-field label="パスワード" v-bind:type="showPassword ? 'text': 'password'" prepend-icon="mdi-lock" @click:append="showPassword = !showPassword" v-bind:append-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'" :error-messages="errors" v-model="password" />
                 </validation-provider>
                 <v-card-actions class="justify-center">
-                  <v-btn class="info" @click="signUp" :disabled="processing || invalid">サインアップ</v-btn>
+                  <v-btn class="info" type="submit" :disabled="processing">サインアップ</v-btn>
                 </v-card-actions>
               </v-form>
             </validation-observer>
