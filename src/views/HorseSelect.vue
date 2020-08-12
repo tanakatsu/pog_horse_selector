@@ -112,15 +112,12 @@
 <script>
 import firebase from 'firebase'
 import { mapActions, mapGetters, mapState } from 'vuex'
-import { required, regex, min, numeric, min_value } from 'vee-validate/dist/rules'
+import { required, min } from 'vee-validate/dist/rules'
 import { localize, extend, ValidationObserver, ValidationProvider } from 'vee-validate'
 import ja from 'vee-validate/dist/locale/ja.json'
 const horse_catalogue = require("../assets/horse_catalogue.json")
 extend('required', required)
-extend('regex', regex)
 extend('min', min)
-extend('numeric', numeric)
-extend('min_value', min_value)
 localize('ja', ja)
 
 extend('isHorseId', {
