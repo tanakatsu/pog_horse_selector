@@ -81,6 +81,7 @@ $ yarn run serve
 
 ```
 $ cp .env.local .env.production
+$ export NODE_OPTIONS=--openssl-legacy-provider  # You may need this
 $ yarn run build
 ```
 
