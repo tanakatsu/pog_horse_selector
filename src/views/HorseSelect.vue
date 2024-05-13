@@ -36,7 +36,8 @@
           >
           <template v-slot:item="{ item }">
             <v-list-item-content>
-              <v-list-item-title v-text="item.name"></v-list-item-title>
+              <v-list-item-title v-if="item.selected" v-text="'✔ ' + item.name"></v-list-item-title>
+              <v-list-item-title v-else v-text="item.name"></v-list-item-title>
               <v-list-item-subtitle>
                 父:{{item.sire}} 母:{{item.mare}}
               </v-list-item-subtitle>
@@ -106,6 +107,17 @@
         </validation-observer>
       </v-card>
     </v-dialog>
+    <v-dialog v-model="alertConflict" max-width="500px">
+      <v-card>
+        <v-card-title>重複指名</v-card-title>
+        <v-card-text><v-icon>mdi-alert</v-icon> この馬はすでに選択されています</v-card-text>
+        <v-card-actions>
+          <v-spacer />
+            <v-btn @click="alertConflict = false">OK</v-btn>
+          <v-spacer />
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
   </v-container>
 </template>
 
@@ -145,6 +157,7 @@ export default {
       horse: {},
       owner_name: null,
       showInputDialog: false,
+      alertConflict: false,
       processing: false,
       max_suggest: 5,
       max_suggests: [3, 5, 8, 10],
@@ -153,9 +166,10 @@ export default {
   methods: {
     searchHorses: function(searchWord) {
       const mare_matched = this.horses.filter(function(horse) {
-        if (horse.po_name) {
-          return false
-        }
+        // if (horse.po_name) {
+        //   return false
+        // }
+
         // TODO: indexOfの位置でソート
         return horse.mare.indexOf(searchWord) === 0
       })
@@ -173,6 +187,7 @@ export default {
           mare: this.search,
           id: null,
         }
+        this.showInputDialog = true
       } else {
         // データベースに存在する場合
         const targetHorse = this.horses.find(horse => {
@@ -186,8 +201,12 @@ export default {
           mare: targetHorse.mare,
           id: targetHorse.id,
         }
+        if (!targetHorse.selected) {
+          this.showInputDialog = true
+        } else {
+          this.alertConflict = true
+        }
       }
-      this.showInputDialog = true
     },
     closeInputDialog: function() {
       this.owner_name = null
@@ -255,9 +274,13 @@ export default {
       }
       this.suggested_horses = this.searchHorses(val)
 
-      // すでに選ばれている馬は除外する
       const selected_mare_list = this.selected_horses.map(horse => horse.mare)
-      this.suggested_horses = this.suggested_horses.filter(horse => !selected_mare_list.includes(horse.mare))
+      this.suggested_horses.forEach(horse => {
+        if (selected_mare_list.includes(horse.mare)) {
+          // すでに選ばれている馬はフラグを立てる
+          horse.selected = true
+        }
+      })
 
       this.suggested_horses = this.suggested_horses.slice(0, this.max_suggest)  // clipping
     },
