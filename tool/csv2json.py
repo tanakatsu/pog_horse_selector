@@ -40,6 +40,15 @@ parser.add_argument("-o", "--output", type=str, default="horse_catalogue.json", 
 args = parser.parse_args()
 
 df = pd.read_csv(args.csvfile)
+missing_rows = df["name"].isnull() | df["sire"].isnull() | df["mare"].isnull()
+for _, row in df[missing_rows].iterrows():
+    if isinstance(row["name"], float):
+        print(f"Missing name: {row['id']}")
+    if isinstance(row["sire"], float):
+        print(f"Missing sire: {row['id']}")
+    if isinstance(row["mare"], float):
+        print(f"Missing mare: {row['id']}")
+df = df[~missing_rows]
 df['sort_order'] = df['sire'].apply(lambda x: len(SIRE_RANK) - SIRE_RANK.index(x) if x in SIRE_RANK else 0)
 df = df.sort_values('sort_order', ascending=False)
 data = []
