@@ -233,7 +233,7 @@ export default {
       })
     },
     nextHorseNo: function(owner) {
-      return (owner in this.ownerHorseCount) ? this.ownerHorseCount[owner] + 1: 1
+      return (owner in this.ownerHorseLastNo) ? this.ownerHorseLastNo[owner] + 1: 1
     },
     ...mapActions([
       'fetch_data',  // this.fetch_data() を this.$store.dispatch('fetch_data') にマッピングする
@@ -290,6 +290,7 @@ export default {
   computed: {
     ...mapGetters([
       'ownerHorseCount',
+      'ownerHorseLastNo',
       'sorted_owners'
     ]),
     ...mapState([

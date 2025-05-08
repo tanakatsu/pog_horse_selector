@@ -22,6 +22,19 @@ export default new Vuex.Store({
       }, {})
       return horse_cnt
     },
+    ownerHorseLastNo: state => {
+      const horse_last_no = state.selected_horses.reduce((acc, val) => {
+        if (acc[val.po_name]) {
+          if (acc[val.po_name] < val.po_order_no) {
+            acc[val.po_name] = val.po_order_no
+          }
+        } else {
+          acc[val.po_name] = val.po_order_no
+        }
+        return acc
+      }, {})
+      return horse_last_no
+    },
     ownerHorses: state => {
       const owner_horses = state.selected_horses.reduce((acc, val) => {
         if (acc[val.po_name]) {
