@@ -277,8 +277,10 @@ export default {
       const selected_mare_list = this.selected_horses.map(horse => horse.mare)
       this.suggested_horses.forEach(horse => {
         if (selected_mare_list.includes(horse.mare)) {
-          // すでに選ばれている馬はフラグを立てる
+          // すでに選ばれている馬は選択済みフラグを立てる
           horse.selected = true
+        } else {
+          horse.selected = false
         }
       })
 
