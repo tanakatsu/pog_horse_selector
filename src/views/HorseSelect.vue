@@ -25,6 +25,7 @@
           v-model="selected_mare"
           :items="suggested_horses"
           :search-input.sync="search"
+          :disabled="sorted_owners.length == 0"
           outlined
           clearable
           hide-no-data
